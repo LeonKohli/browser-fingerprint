@@ -43,12 +43,45 @@ interface WebGLRenderingContext {
 declare global {
     interface Window {
         webkitAudioContext: typeof AudioContext;
+        OfflineAudioContext: typeof AudioContext;
+        webkitOfflineAudioContext: typeof AudioContext;
     }
+}
+
+interface AudioFingerprintData {
+    hash: number;
+}
+
+interface AudioParam {
+    value: number;
+}
+
+interface DynamicsCompressorNode extends AudioNode {
+    threshold: AudioParam;
+    knee: AudioParam;
+    ratio: AudioParam;
+    reduction: number;
+    attack: AudioParam;
+    release: AudioParam;
+}
+
+interface BatteryInfo {
+    charging: boolean;
+    chargingTime: number;
+    dischargingTime: number;
+    level: number;
+}
+
+interface NetworkInfo {
+    downlink: number;
+    effectiveType: string;
+    rtt: number;
+    saveData: boolean;
 }
 
 export function useFingerprintCollectors() {
     const generateCanvasFingerprint = (): string | null => {
-        if (!process.client) return null;
+        if (!import.meta.client) return null;
 
         try {
             const canvas = document.createElement('canvas');
@@ -82,44 +115,58 @@ export function useFingerprintCollectors() {
         }
     };
 
-    const getAudioFingerprint = async (): Promise<string | null> => {
-        if (!process.client) return null;
+    const getAudioFingerprint = async (): Promise<AudioFingerprintData | null> => {
+        if (!import.meta.client) return null;
 
         try {
-            if (!document.body.hasAttribute('data-user-interacted')) {
+            // Get appropriate AudioContext constructor
+            const AudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+            if (!AudioContextClass) {
                 return null;
             }
 
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            const audioContext = new AudioContextClass();
-            const oscillator = audioContext.createOscillator();
-            const analyser = audioContext.createAnalyser();
-            const gainNode = audioContext.createGain();
-            const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+            // Create audio context
+            const context = new AudioContextClass(1, 5000, 44100);
 
-            gainNode.gain.value = 0;
-            oscillator.type = 'triangle';
-            oscillator.connect(analyser);
-            analyser.connect(scriptProcessor);
-            scriptProcessor.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            // Create oscillator
+            const oscillator = context.createOscillator();
+            oscillator.type = "triangle";
+            oscillator.frequency.value = 1000;
 
-            oscillator.start(0);
+            // Create compressor
+            const compressor = context.createDynamicsCompressor() as DynamicsCompressorNode;
+            compressor.threshold.value = -50;
+            compressor.knee.value = 40;
+            compressor.ratio.value = 12;
+            // Remove the reduction.value assignment as it's a read-only property
+            compressor.attack.value = 0;
+            compressor.release.value = 0.2;
 
-            return new Promise((resolve) => {
-                const audioData: number[] = [];
-                scriptProcessor.onaudioprocess = (e) => {
-                    const inputData = e.inputBuffer.getChannelData(0);
-                    if (audioData.length < 50) {
-                        audioData.push(...inputData.slice(0, 50 - audioData.length));
-                    }
-                    if (audioData.length >= 50) {
-                        oscillator.stop();
-                        audioContext.close();
-                        resolve(audioData.slice(0, 50).join(','));
-                    }
-                };
+            // Connect nodes
+            oscillator.connect(compressor);
+            compressor.connect(context.destination);
+
+            // Start oscillator
+            oscillator.start();
+
+            // Render audio and calculate hash
+            const buffer = await new Promise<AudioBuffer>((resolve) => {
+                context.oncomplete = (event) => resolve(event.renderedBuffer);
+                context.startRendering();
             });
+
+            // Get samples and calculate hash
+            const samples = buffer.getChannelData(0);
+            let hash = 0;
+            for (let i = 0; i < samples.length; ++i) {
+                const sample = samples[i];
+                if (typeof sample === 'number') {
+                    hash += Math.abs(sample);
+                }
+            }
+
+            return { hash };
+
         } catch (error) {
             console.error('Error generating audio fingerprint:', error);
             return null;
@@ -127,14 +174,40 @@ export function useFingerprintCollectors() {
     };
 
     const getFonts = (): FontDetectionResult => {
-        if (!process.client) return { fonts: [], total: 0 };
+        if (!import.meta.client) return { fonts: [], total: 0 };
 
         const baseFonts = ['monospace', 'sans-serif', 'serif'];
         const fontList = [
+            // Common Windows Fonts
             'Arial', 'Arial Black', 'Arial Narrow', 'Calibri', 'Cambria',
             'Cambria Math', 'Comic Sans MS', 'Courier', 'Courier New',
             'Georgia', 'Helvetica', 'Impact', 'Times', 'Times New Roman',
-            'Trebuchet MS', 'Verdana'
+            'Trebuchet MS', 'Verdana', 'Segoe UI', 'Tahoma', 'Consolas',
+            'Lucida Console', 'MS Gothic', 'MS PGothic', 'MS Sans Serif',
+            'MS Serif', 'Palatino Linotype', 'Book Antiqua',
+            
+            // Common Mac Fonts
+            'American Typewriter', 'Andale Mono', 'Apple Chancery',
+            'Apple Color Emoji', 'Apple SD Gothic Neo', 'AppleGothic',
+            'Avenir', 'Avenir Next', 'Baskerville', 'Big Caslon',
+            'Brush Script MT', 'Chalkboard', 'Cochin', 'Copperplate',
+            'Didot', 'Futura', 'Geneva', 'Gill Sans', 'Helvetica Neue',
+            'Herculanum', 'Hoefler Text', 'Lucida Grande', 'Luminari',
+            'Marker Felt', 'Menlo', 'Monaco', 'Noteworthy', 'Optima',
+            'Papyrus', 'Phosphate', 'Rockwell', 'Skia', 'Snell Roundhand',
+            'Zapfino',
+
+            // Common Linux Fonts
+            'DejaVu Sans', 'DejaVu Sans Mono', 'DejaVu Serif', 'Liberation Mono',
+            'Liberation Sans', 'Liberation Serif', 'Ubuntu', 'Ubuntu Mono',
+            'Noto Sans', 'Noto Serif', 'Droid Sans', 'Droid Serif',
+            'FreeMono', 'FreeSans', 'FreeSerif', 'Nimbus Roman', 'Nimbus Sans',
+            
+            // Popular Web Fonts
+            'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Source Sans Pro',
+            'Raleway', 'PT Sans', 'Noto Sans', 'Ubuntu', 'Nunito',
+            'Playfair Display', 'Poppins', 'Merriweather', 'Oswald',
+            'Quicksand', 'Dancing Script', 'Pacifico'
         ];
 
         const testString = 'mmmmmmmmmmlli';
@@ -158,7 +231,7 @@ export function useFingerprintCollectors() {
 
             let detected = false;
             for (const baseFont of baseFonts) {
-                context.font = `${testSize} ${font}, ${baseFont}`;
+                context.font = `${testSize} "${font}", ${baseFont}`;
                 const width = context.measureText(testString).width;
                 if (width !== baseWidth[baseFont]) {
                     detected = true;
@@ -177,7 +250,7 @@ export function useFingerprintCollectors() {
     };
 
     const getWebGLFingerprint = (): WebGLInfo => {
-        if (!process.client) {
+        if (!import.meta.client) {
             return {
                 error: 'Not running in browser context',
                 renderer: null,
@@ -234,10 +307,77 @@ export function useFingerprintCollectors() {
         }
     };
 
+    const getBatteryInfo = async (): Promise<BatteryInfo | null> => {
+        if (!import.meta.client || !('getBattery' in navigator)) return null;
+        
+        try {
+            const battery = await (navigator as any).getBattery();
+            return {
+                charging: battery.charging,
+                chargingTime: battery.chargingTime,
+                dischargingTime: battery.dischargingTime,
+                level: battery.level
+            };
+        } catch (error) {
+            console.error('Error getting battery info:', error);
+            return null;
+        }
+    };
+
+    const getNetworkInfo = (): NetworkInfo | null => {
+        if (!import.meta.client || !('connection' in navigator)) return null;
+        
+        const connection = (navigator as any).connection;
+        return {
+            downlink: connection?.downlink,
+            effectiveType: connection?.effectiveType,
+            rtt: connection?.rtt,
+            saveData: connection?.saveData
+        };
+    };
+
+    const getHardwareAcceleration = (): boolean => {
+        if (!import.meta.client) return false;
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('webgl');
+        if (!ctx) return false;
+        
+        const debugInfo = ctx.getExtension('WEBGL_debug_renderer_info');
+        if (!debugInfo) return false;
+        
+        const renderer = ctx.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        return !/SwiftShader|Software|Microsoft Basic Render/i.test(renderer);
+    };
+
+    const getTouchSupport = () => {
+        if (!import.meta.client) return null;
+        
+        return {
+            maxTouchPoints: navigator.maxTouchPoints,
+            touchEvent: 'ontouchstart' in window,
+            touchPoints: navigator.maxTouchPoints || 0
+        };
+    };
+
+    const getColorDepth = () => {
+        if (!import.meta.client) return null;
+        
+        return {
+            colorDepth: screen.colorDepth,
+            pixelDepth: screen.pixelDepth
+        };
+    };
+
     return {
         generateCanvasFingerprint,
         getAudioFingerprint,
         getFonts,
-        getWebGLFingerprint
+        getWebGLFingerprint,
+        getBatteryInfo,
+        getNetworkInfo,
+        getHardwareAcceleration,
+        getTouchSupport,
+        getColorDepth
     };
-} 
+}

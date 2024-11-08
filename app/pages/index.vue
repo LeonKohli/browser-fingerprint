@@ -142,6 +142,17 @@
                                                     class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[200px] shadow-sm" />
                                             </div>
                                         </template>
+                                        <template v-else-if="key === 'audioFingerprint'">
+                                            <div class="space-y-3">
+                                                <div
+                                                    class="p-3 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
+                                                    {{ value?.hash || 'No audio fingerprint available' }}
+                                                </div>
+                                                <div class="relative p-4 overflow-hidden bg-white border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+                                                    <AudioVisualizer :data="generateAudioVisualizerData(value)" />
+                                                </div>
+                                            </div>
+                                        </template>
                                         <template v-else-if="typeof value === 'object'">
                                             <pre
                                                 class="p-3 overflow-x-auto text-xs rounded-lg bg-gray-50 dark:bg-gray-900">{{ JSON.stringify(value, null, 2) }}</pre>
@@ -221,6 +232,22 @@ const {
     getWebGLFingerprint
 } = useFingerprintCollectors();
 
+// Utility function to sort object keys recursively
+const sortObjectKeys = (obj) => {
+    if (typeof obj !== 'object' || obj === null) return obj;
+    
+    if (Array.isArray(obj)) {
+        return obj.map(sortObjectKeys);
+    }
+    
+    const sortedKeys = Object.keys(obj).sort();
+    const result = {};
+    for (const key of sortedKeys) {
+        result[key] = sortObjectKeys(obj[key]);
+    }
+    return result;
+};
+
 const generateFingerprint = async () => {
     const fp = {};
     const collectors = createSectionCollectors(fp);
@@ -228,7 +255,9 @@ const generateFingerprint = async () => {
     try {
         await Promise.allSettled(collectors.map(collector => collector()));
 
-        const fingerprintString = JSON.stringify(fp);
+        // Sort object keys before hashing to ensure consistent results
+        const sortedFingerprint = sortObjectKeys(fp);
+        const fingerprintString = JSON.stringify(sortedFingerprint);
         const encoder = new TextEncoder();
         const data = encoder.encode(fingerprintString);
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -478,6 +507,34 @@ watch(fingerprint, (newValue) => {
         entropyScore.value = 0;
     }
 }, { deep: true, immediate: true });
+
+const generateAudioVisualizerData = (audioData) => {
+    if (!audioData || typeof audioData.hash !== 'number') {
+        return new Array(50).fill(0);
+    }
+    
+    // Generate visualization data from the hash
+    const hashString = audioData.hash.toString();
+    const data = [];
+    for (let i = 0; i < 50; i++) {
+        const value = (parseInt(hashString.slice(i % hashString.length, (i % hashString.length) + 1)) / 10) - 0.5;
+        data.push(value);
+    }
+    return data;
+};
+
+// Add near the top of the <script setup> section
+const colorMode = useColorMode();
+
+// Add these computed properties
+const isDark = computed(() => colorMode.value === 'dark');
+
+const toggleColorMode = () => {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
+};
+
+// Add this button in the template section, I suggest placing it in the header area
+// after the fingerprint icon and before the title
 </script>
 <style>
 .fade-enter-active,

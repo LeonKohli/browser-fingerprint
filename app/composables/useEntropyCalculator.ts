@@ -11,6 +11,7 @@ interface Probabilities {
     }
     screen: {
         resolution: number
+        colorDepth: number
     }
     media: {
         canvasFingerprint: number
@@ -18,10 +19,14 @@ interface Probabilities {
     }
     webgl: {
         renderer: number
+        hardwareAcceleration: number
     }
     hardware: {
         deviceMemory: number
         cpuCores: number
+        touchSupport: number
+        battery: number
+        network: number
     }
 }
 
@@ -38,6 +43,7 @@ const probabilities: Probabilities = {
     },
     screen: {
         resolution: 0.05,
+        colorDepth: 0.03,
     },
     media: {
         canvasFingerprint: 0.1,
@@ -45,10 +51,14 @@ const probabilities: Probabilities = {
     },
     webgl: {
         renderer: 0.05,
+        hardwareAcceleration: 0.02,
     },
     hardware: {
         deviceMemory: 0.3,
         cpuCores: 0.2,
+        touchSupport: 0.15,
+        battery: 0.1,
+        network: 0.05,
     },
 };
 
@@ -90,6 +100,20 @@ export function useEntropyCalculator() {
         if (fp.hardware) {
             if (fp.hardware.deviceMemory) totalEntropy += calculateSurprisal(probabilities.hardware.deviceMemory);
             if (fp.hardware.cpuCores) totalEntropy += calculateSurprisal(probabilities.hardware.cpuCores);
+        }
+
+        if (fp.screen) {
+            if (fp.screen.colorDepth) totalEntropy += calculateSurprisal(probabilities.screen.colorDepth);
+        }
+
+        if (fp.webgl) {
+            if (fp.webgl.hardwareAcceleration) totalEntropy += calculateSurprisal(probabilities.webgl.hardwareAcceleration);
+        }
+
+        if (fp.hardware) {
+            if (fp.hardware.touchSupport) totalEntropy += calculateSurprisal(probabilities.hardware.touchSupport);
+            if (fp.hardware.battery) totalEntropy += calculateSurprisal(probabilities.hardware.battery);
+            if (fp.hardware.network) totalEntropy += calculateSurprisal(probabilities.hardware.network);
         }
 
         return totalEntropy;
