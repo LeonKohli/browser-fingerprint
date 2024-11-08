@@ -65,6 +65,20 @@ interface DynamicsCompressorNode extends AudioNode {
     release: AudioParam;
 }
 
+interface BatteryInfo {
+    charging: boolean;
+    chargingTime: number;
+    dischargingTime: number;
+    level: number;
+}
+
+interface NetworkInfo {
+    downlink: number;
+    effectiveType: string;
+    rtt: number;
+    saveData: boolean;
+}
+
 export function useFingerprintCollectors() {
     const generateCanvasFingerprint = (): string | null => {
         if (!import.meta.client) return null;
@@ -267,10 +281,77 @@ export function useFingerprintCollectors() {
         }
     };
 
+    const getBatteryInfo = async (): Promise<BatteryInfo | null> => {
+        if (!import.meta.client || !('getBattery' in navigator)) return null;
+        
+        try {
+            const battery = await (navigator as any).getBattery();
+            return {
+                charging: battery.charging,
+                chargingTime: battery.chargingTime,
+                dischargingTime: battery.dischargingTime,
+                level: battery.level
+            };
+        } catch (error) {
+            console.error('Error getting battery info:', error);
+            return null;
+        }
+    };
+
+    const getNetworkInfo = (): NetworkInfo | null => {
+        if (!import.meta.client || !('connection' in navigator)) return null;
+        
+        const connection = (navigator as any).connection;
+        return {
+            downlink: connection?.downlink,
+            effectiveType: connection?.effectiveType,
+            rtt: connection?.rtt,
+            saveData: connection?.saveData
+        };
+    };
+
+    const getHardwareAcceleration = (): boolean => {
+        if (!import.meta.client) return false;
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('webgl');
+        if (!ctx) return false;
+        
+        const debugInfo = ctx.getExtension('WEBGL_debug_renderer_info');
+        if (!debugInfo) return false;
+        
+        const renderer = ctx.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        return !/SwiftShader|Software|Microsoft Basic Render/i.test(renderer);
+    };
+
+    const getTouchSupport = () => {
+        if (!import.meta.client) return null;
+        
+        return {
+            maxTouchPoints: navigator.maxTouchPoints,
+            touchEvent: 'ontouchstart' in window,
+            touchPoints: navigator.maxTouchPoints || 0
+        };
+    };
+
+    const getColorDepth = () => {
+        if (!import.meta.client) return null;
+        
+        return {
+            colorDepth: screen.colorDepth,
+            pixelDepth: screen.pixelDepth
+        };
+    };
+
     return {
         generateCanvasFingerprint,
         getAudioFingerprint,
         getFonts,
-        getWebGLFingerprint
+        getWebGLFingerprint,
+        getBatteryInfo,
+        getNetworkInfo,
+        getHardwareAcceleration,
+        getTouchSupport,
+        getColorDepth
     };
 }

@@ -232,6 +232,22 @@ const {
     getWebGLFingerprint
 } = useFingerprintCollectors();
 
+// Utility function to sort object keys recursively
+const sortObjectKeys = (obj) => {
+    if (typeof obj !== 'object' || obj === null) return obj;
+    
+    if (Array.isArray(obj)) {
+        return obj.map(sortObjectKeys);
+    }
+    
+    const sortedKeys = Object.keys(obj).sort();
+    const result = {};
+    for (const key of sortedKeys) {
+        result[key] = sortObjectKeys(obj[key]);
+    }
+    return result;
+};
+
 const generateFingerprint = async () => {
     const fp = {};
     const collectors = createSectionCollectors(fp);
@@ -239,7 +255,9 @@ const generateFingerprint = async () => {
     try {
         await Promise.allSettled(collectors.map(collector => collector()));
 
-        const fingerprintString = JSON.stringify(fp);
+        // Sort object keys before hashing to ensure consistent results
+        const sortedFingerprint = sortObjectKeys(fp);
+        const fingerprintString = JSON.stringify(sortedFingerprint);
         const encoder = new TextEncoder();
         const data = encoder.encode(fingerprintString);
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
