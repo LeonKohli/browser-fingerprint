@@ -46,6 +46,10 @@ declare global {
     }
 }
 
+interface AudioFingerprintData {
+    values: number[];
+}
+
 export function useFingerprintCollectors() {
     const generateCanvasFingerprint = (): string | null => {
         if (!process.client) return null;
@@ -82,7 +86,75 @@ export function useFingerprintCollectors() {
         }
     };
 
-    const getAudioFingerprint = async (): Promise<string | null> => {
+    const createAudioVisualization = (audioData: number[]): string => {
+        if (!process.client) return '';
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+
+        // Set canvas dimensions
+        canvas.width = 300;
+        canvas.height = 100;
+
+        // Style configuration
+        const styles = {
+            backgroundColor: '#1e293b', // dark:bg-slate-800
+            waveColor: '#3b82f6', // text-blue-500
+            waveWidth: 2,
+            padding: 10
+        };
+
+        // Clear canvas
+        ctx.fillStyle = styles.backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw waveform
+        ctx.beginPath();
+        ctx.strokeStyle = styles.waveColor;
+        ctx.lineWidth = styles.waveWidth;
+
+        const width = canvas.width - (styles.padding * 2);
+        const height = canvas.height - (styles.padding * 2);
+        const step = width / (audioData.length - 1);
+
+        audioData.forEach((value, index) => {
+            const x = styles.padding + (index * step);
+            const y = styles.padding + (height / 2) + (value * height / 2);
+
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+
+        ctx.stroke();
+
+        // Add grid lines
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)'; // slate-400 with low opacity
+        ctx.lineWidth = 1;
+
+        // Vertical grid lines
+        for (let i = 0; i <= width; i += width / 10) {
+            ctx.beginPath();
+            ctx.moveTo(styles.padding + i, styles.padding);
+            ctx.lineTo(styles.padding + i, canvas.height - styles.padding);
+            ctx.stroke();
+        }
+
+        // Horizontal grid lines
+        for (let i = 0; i <= height; i += height / 4) {
+            ctx.beginPath();
+            ctx.moveTo(styles.padding, styles.padding + i);
+            ctx.lineTo(canvas.width - styles.padding, styles.padding + i);
+            ctx.stroke();
+        }
+
+        return canvas.toDataURL();
+    };
+
+    const getAudioFingerprint = async (): Promise<AudioFingerprintData | null> => {
         if (!process.client) return null;
 
         try {
@@ -116,7 +188,9 @@ export function useFingerprintCollectors() {
                     if (audioData.length >= 50) {
                         oscillator.stop();
                         audioContext.close();
-                        resolve(audioData.slice(0, 50).join(','));
+                        resolve({
+                            values: audioData.slice(0, 50)
+                        });
                     }
                 };
             });

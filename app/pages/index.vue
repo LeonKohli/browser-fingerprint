@@ -142,6 +142,21 @@
                                                     class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[200px] shadow-sm" />
                                             </div>
                                         </template>
+                                        <template v-else-if="key === 'audioFingerprint'">
+                                            <div class="space-y-3">
+                                                <div
+                                                    class="p-3 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
+                                                    {{ typeof value === 'object' && value?.values ?
+                                                        value.values.join(',').substring(0, 64) + '...' :
+                                                        String(value).substring(0, 64) + '...'
+                                                    }}
+                                                </div>
+                                                <div v-if="typeof value === 'object' && value?.values"
+                                                    class="relative overflow-hidden border border-gray-200 rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                                                    <AudioVisualizer :data="value.values" />
+                                                </div>
+                                            </div>
+                                        </template>
                                         <template v-else-if="typeof value === 'object'">
                                             <pre
                                                 class="p-3 overflow-x-auto text-xs rounded-lg bg-gray-50 dark:bg-gray-900">{{ JSON.stringify(value, null, 2) }}</pre>
