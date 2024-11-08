@@ -43,16 +43,31 @@ interface WebGLRenderingContext {
 declare global {
     interface Window {
         webkitAudioContext: typeof AudioContext;
+        OfflineAudioContext: typeof AudioContext;
+        webkitOfflineAudioContext: typeof AudioContext;
     }
 }
 
 interface AudioFingerprintData {
-    values: number[];
+    hash: number;
+}
+
+interface AudioParam {
+    value: number;
+}
+
+interface DynamicsCompressorNode extends AudioNode {
+    threshold: AudioParam;
+    knee: AudioParam;
+    ratio: AudioParam;
+    reduction: number;
+    attack: AudioParam;
+    release: AudioParam;
 }
 
 export function useFingerprintCollectors() {
     const generateCanvasFingerprint = (): string | null => {
-        if (!process.client) return null;
+        if (!import.meta.client) return null;
 
         try {
             const canvas = document.createElement('canvas');
@@ -86,114 +101,58 @@ export function useFingerprintCollectors() {
         }
     };
 
-    const createAudioVisualization = (audioData: number[]): string => {
-        if (!process.client) return '';
-
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return '';
-
-        // Set canvas dimensions
-        canvas.width = 300;
-        canvas.height = 100;
-
-        // Style configuration
-        const styles = {
-            backgroundColor: '#1e293b', // dark:bg-slate-800
-            waveColor: '#3b82f6', // text-blue-500
-            waveWidth: 2,
-            padding: 10
-        };
-
-        // Clear canvas
-        ctx.fillStyle = styles.backgroundColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw waveform
-        ctx.beginPath();
-        ctx.strokeStyle = styles.waveColor;
-        ctx.lineWidth = styles.waveWidth;
-
-        const width = canvas.width - (styles.padding * 2);
-        const height = canvas.height - (styles.padding * 2);
-        const step = width / (audioData.length - 1);
-
-        audioData.forEach((value, index) => {
-            const x = styles.padding + (index * step);
-            const y = styles.padding + (height / 2) + (value * height / 2);
-
-            if (index === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                ctx.lineTo(x, y);
-            }
-        });
-
-        ctx.stroke();
-
-        // Add grid lines
-        ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)'; // slate-400 with low opacity
-        ctx.lineWidth = 1;
-
-        // Vertical grid lines
-        for (let i = 0; i <= width; i += width / 10) {
-            ctx.beginPath();
-            ctx.moveTo(styles.padding + i, styles.padding);
-            ctx.lineTo(styles.padding + i, canvas.height - styles.padding);
-            ctx.stroke();
-        }
-
-        // Horizontal grid lines
-        for (let i = 0; i <= height; i += height / 4) {
-            ctx.beginPath();
-            ctx.moveTo(styles.padding, styles.padding + i);
-            ctx.lineTo(canvas.width - styles.padding, styles.padding + i);
-            ctx.stroke();
-        }
-
-        return canvas.toDataURL();
-    };
-
     const getAudioFingerprint = async (): Promise<AudioFingerprintData | null> => {
-        if (!process.client) return null;
+        if (!import.meta.client) return null;
 
         try {
-            if (!document.body.hasAttribute('data-user-interacted')) {
+            // Get appropriate AudioContext constructor
+            const AudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+            if (!AudioContextClass) {
                 return null;
             }
 
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            const audioContext = new AudioContextClass();
-            const oscillator = audioContext.createOscillator();
-            const analyser = audioContext.createAnalyser();
-            const gainNode = audioContext.createGain();
-            const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+            // Create audio context
+            const context = new AudioContextClass(1, 5000, 44100);
 
-            gainNode.gain.value = 0;
-            oscillator.type = 'triangle';
-            oscillator.connect(analyser);
-            analyser.connect(scriptProcessor);
-            scriptProcessor.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            // Create oscillator
+            const oscillator = context.createOscillator();
+            oscillator.type = "triangle";
+            oscillator.frequency.value = 1000;
 
-            oscillator.start(0);
+            // Create compressor
+            const compressor = context.createDynamicsCompressor() as DynamicsCompressorNode;
+            compressor.threshold.value = -50;
+            compressor.knee.value = 40;
+            compressor.ratio.value = 12;
+            // Remove the reduction.value assignment as it's a read-only property
+            compressor.attack.value = 0;
+            compressor.release.value = 0.2;
 
-            return new Promise((resolve) => {
-                const audioData: number[] = [];
-                scriptProcessor.onaudioprocess = (e) => {
-                    const inputData = e.inputBuffer.getChannelData(0);
-                    if (audioData.length < 50) {
-                        audioData.push(...inputData.slice(0, 50 - audioData.length));
-                    }
-                    if (audioData.length >= 50) {
-                        oscillator.stop();
-                        audioContext.close();
-                        resolve({
-                            values: audioData.slice(0, 50)
-                        });
-                    }
-                };
+            // Connect nodes
+            oscillator.connect(compressor);
+            compressor.connect(context.destination);
+
+            // Start oscillator
+            oscillator.start();
+
+            // Render audio and calculate hash
+            const buffer = await new Promise<AudioBuffer>((resolve) => {
+                context.oncomplete = (event) => resolve(event.renderedBuffer);
+                context.startRendering();
             });
+
+            // Get samples and calculate hash
+            const samples = buffer.getChannelData(0);
+            let hash = 0;
+            for (let i = 0; i < samples.length; ++i) {
+                const sample = samples[i];
+                if (typeof sample === 'number') {
+                    hash += Math.abs(sample);
+                }
+            }
+
+            return { hash };
+
         } catch (error) {
             console.error('Error generating audio fingerprint:', error);
             return null;
@@ -201,7 +160,7 @@ export function useFingerprintCollectors() {
     };
 
     const getFonts = (): FontDetectionResult => {
-        if (!process.client) return { fonts: [], total: 0 };
+        if (!import.meta.client) return { fonts: [], total: 0 };
 
         const baseFonts = ['monospace', 'sans-serif', 'serif'];
         const fontList = [
@@ -251,7 +210,7 @@ export function useFingerprintCollectors() {
     };
 
     const getWebGLFingerprint = (): WebGLInfo => {
-        if (!process.client) {
+        if (!import.meta.client) {
             return {
                 error: 'Not running in browser context',
                 renderer: null,
@@ -314,4 +273,4 @@ export function useFingerprintCollectors() {
         getFonts,
         getWebGLFingerprint
     };
-} 
+}

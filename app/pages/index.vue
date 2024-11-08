@@ -146,14 +146,10 @@
                                             <div class="space-y-3">
                                                 <div
                                                     class="p-3 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
-                                                    {{ typeof value === 'object' && value?.values ?
-                                                        value.values.join(',').substring(0, 64) + '...' :
-                                                        String(value).substring(0, 64) + '...'
-                                                    }}
+                                                    {{ value?.hash || 'No audio fingerprint available' }}
                                                 </div>
-                                                <div v-if="typeof value === 'object' && value?.values"
-                                                    class="relative overflow-hidden border border-gray-200 rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                                                    <AudioVisualizer :data="value.values" />
+                                                <div class="relative p-4 overflow-hidden bg-white border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+                                                    <AudioVisualizer :data="generateAudioVisualizerData(value)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -493,6 +489,21 @@ watch(fingerprint, (newValue) => {
         entropyScore.value = 0;
     }
 }, { deep: true, immediate: true });
+
+const generateAudioVisualizerData = (audioData) => {
+    if (!audioData || typeof audioData.hash !== 'number') {
+        return new Array(50).fill(0);
+    }
+    
+    // Generate visualization data from the hash
+    const hashString = audioData.hash.toString();
+    const data = [];
+    for (let i = 0; i < 50; i++) {
+        const value = (parseInt(hashString.slice(i % hashString.length, (i % hashString.length) + 1)) / 10) - 0.5;
+        data.push(value);
+    }
+    return data;
+};
 </script>
 <style>
 .fade-enter-active,
