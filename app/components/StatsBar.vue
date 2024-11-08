@@ -1,12 +1,12 @@
 <template>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <!-- Entropy Score Card -->
         <div
-            class="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group">
+            class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                        <Icon name="mdi:chart-bar" class="h-5 w-5 text-blue-500" />
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                        <Icon name="mdi:chart-bar" class="w-5 h-5 text-blue-500" />
                     </div>
                     <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Entropy Score
@@ -32,18 +32,18 @@
 
         <!-- Browser Card -->
         <div
-            class="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group">
+            class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
-                    <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center">
-                        <Icon name="mdi:web" class="h-5 w-5 text-purple-500" />
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                        <Icon name="mdi:web" class="w-5 h-5 text-purple-500" />
                     </div>
                     <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Browser
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <div class="text-2xl font-semibold tracking-tight dark:text-white truncate">
+                    <div class="text-2xl font-semibold tracking-tight truncate dark:text-white">
                         {{ browserInfo }}
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -52,25 +52,25 @@
                 </div>
             </div>
             <div
-                class="absolute bottom-0 inset-x-0 h-1 bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+                class="absolute inset-x-0 bottom-0 h-1 transition-colors bg-purple-500/20 group-hover:bg-purple-500/30">
             </div>
         </div>
 
         <!-- Platform Card -->
         <div
-            class="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group">
+            class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
                     <div
-                        class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
-                        <Icon name="mdi:laptop" class="h-5 w-5 text-emerald-500" />
+                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
+                        <Icon name="mdi:laptop" class="w-5 h-5 text-emerald-500" />
                     </div>
                     <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Platform
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <div class="text-2xl font-semibold tracking-tight dark:text-white truncate">
+                    <div class="text-2xl font-semibold tracking-tight truncate dark:text-white">
                         {{ platformInfo }}
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -79,15 +79,22 @@
                 </div>
             </div>
             <div
-                class="absolute bottom-0 inset-x-0 h-1 bg-emerald-500/20 group-hover:bg-emerald-500/30 transition-colors">
+                class="absolute inset-x-0 bottom-0 h-1 transition-colors bg-emerald-500/20 group-hover:bg-emerald-500/30">
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+interface Fingerprint {
+    browser?: {
+        vendor?: string;
+        platform?: string;
+    };
+}
+
 interface Props {
-    fingerprint: any;
+    fingerprint: Fingerprint | null;
     entropyScore: number;
     isComplete: boolean;
     browserInfo: string;
