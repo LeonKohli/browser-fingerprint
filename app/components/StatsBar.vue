@@ -8,9 +8,20 @@
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20">
                         <Icon name="mdi:chart-bar" class="w-5 h-5 text-blue-500" />
                     </div>
-                    <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Entropy Score
-                    </div>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400 cursor-help">
+                                    Entropy Score
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent class="max-w-xs">
+                                <p class="text-sm">
+                                    Browser fingerprinting calculates how unique your browser appears among others. The entropy score (measured in bits) indicates this uniqueness. A score of 0 means your browser appears identical to others, while higher scores mean greater uniqueness. However, this score is just an estimate based on limited data.
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
                 <div class="space-y-1">
                     <div class="flex items-baseline gap-1">
@@ -106,15 +117,15 @@ const props = defineProps<Props>();
 const uniquenessMessage = computed(() => {
     const score = props.entropyScore;
     if (score >= 20) {
-        return 'Your fingerprint is extremely unique among internet users.';
+        return 'Your fingerprint appears highly unique, which might make tracking easier.';
     } else if (score >= 15) {
-        return 'Your fingerprint is highly unique among internet users.';
+        return 'Your fingerprint shows notable uniqueness among sampled users.';
     } else if (score >= 10) {
-        return 'Your fingerprint is moderately unique.';
+        return 'Your fingerprint has moderate distinctiveness.';
     } else if (score >= 5) {
-        return 'Your fingerprint has some unique characteristics.';
+        return 'Your fingerprint shares characteristics with many other users.';
     } else {
-        return 'Your fingerprint shares common characteristics with many users.';
+        return 'Your fingerprint appears similar to many other users, which may help blend in.';
     }
 });
 </script>
