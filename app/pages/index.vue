@@ -1,7 +1,6 @@
 <template>
     <div class="min-h-screen p-4 transition-colors duration-200 sm:p-8 dark:bg-gray-900 bg-gray-50">
         <div class="max-w-4xl mx-auto space-y-8">
-            <!-- Replace the Stats Bar section with the new component -->
             <StatsBar :fingerprint="fingerprint" :entropy-score="entropyScore" :is-complete="isComplete"
                 :browser-info="browserInfo" :platform-info="platformInfo" />
 
@@ -21,28 +20,53 @@
                 </div>
 
                 <div class="space-y-2">
+                    <div class="flex justify-center">
+                        <a
+                            href="https://github.com/LeonKohli/browser-fingerprint"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 text-sm text-gray-500 transition-colors duration-200 group dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                        >
+                            <div class="flex items-center gap-1.5">
+                                <Icon name="mdi:github" class="w-4 h-4" />
+                                <span class="font-medium">Open Source Project</span>
+                            </div>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400">
+                                •
+                            </span>
+                            <span class="text-xs">
+                                Star us on GitHub
+                                <Icon 
+                                    name="mdi:arrow-top-right" 
+                                    class="inline-block w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" 
+                                />
+                            </span>
+                        </a>
+                    </div>
                     <h1 class="text-4xl font-bold tracking-tight dark:text-white">Browser Fingerprint</h1>
-                    <p class="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
-                        Your unique browser fingerprint hash:
-                    </p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <p class="max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+                            Your unique browser fingerprint hash:
+                        </p>
+                    </div>
                 </div>
+            </div>
 
-                <div class="relative max-w-2xl mx-auto">
-                    <div v-if="fingerprint?.hash"
-                        class="p-4 font-mono text-sm text-green-400 break-all bg-gray-800 rounded-lg shadow-lg dark:bg-gray-950 group">
-                        {{ fingerprint.hash }}
-                        <div
-                            class="absolute inset-0 flex items-center justify-center transition-opacity rounded-lg opacity-0 bg-black/50 group-hover:opacity-100">
-                            <button @click="handleCopyFingerprint" :disabled="loading"
-                                class="flex items-center gap-2 px-4 py-2 text-gray-900 transition-all transform bg-white rounded-lg shadow-lg dark:bg-gray-800 dark:text-white hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-                                <Icon :name="isCopied ? 'mdi:check' : 'mdi:clipboard-outline'"
-                                    class="w-4 h-4 transition-all"
-                                    :class="{ 'text-green-500': isCopied, 'animate-spin': loading }" />
-                                <span class="font-medium">
-                                    {{ loading ? 'Scanning...' : (isCopied ? 'Copied!' : 'Copy Fingerprint') }}
-                                </span>
-                            </button>
-                        </div>
+            <div class="relative max-w-2xl mx-auto">
+                <div v-if="fingerprint?.hash"
+                    class="p-4 font-mono text-sm text-center text-green-400 break-all bg-gray-800 rounded-lg shadow-lg dark:bg-gray-950 group">
+                    {{ fingerprint.hash }}
+                    <div
+                        class="absolute inset-0 flex items-center justify-center transition-opacity rounded-lg opacity-0 bg-black/50 group-hover:opacity-100">
+                        <button @click="handleCopyFingerprint" :disabled="loading"
+                            class="flex items-center gap-2 px-4 py-2 text-gray-900 transition-all transform bg-white rounded-lg shadow-lg dark:bg-gray-800 dark:text-white hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                            <Icon :name="isCopied ? 'mdi:check' : 'mdi:clipboard-outline'"
+                                class="w-4 h-4 transition-all"
+                                :class="{ 'text-green-500': isCopied, 'animate-spin': loading }" />
+                            <span class="font-medium">
+                                {{ loading ? 'Scanning...' : (isCopied ? 'Copied!' : 'Copy Fingerprint') }}
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
