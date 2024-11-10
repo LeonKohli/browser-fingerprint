@@ -95,32 +95,50 @@
             <div class="grid grid-cols-1 gap-6">
                 <div v-for="section in sections" :key="section.id"
                     class="transition-all duration-200 bg-white border border-gray-100 shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md dark:border-gray-700">
-                    <button @click="expandedSections[section.id] = !expandedSections[section.id]"
-                        class="flex items-center justify-between w-full px-6 py-5 text-left transition-colors rounded-xl group"
-                        :class="[
-                            expandedSections[section.id] ? 'bg-gray-50/80 dark:bg-gray-700/50' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/30',
-                            'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
-                        ]">
-                        <div class="flex items-center gap-4">
-                            <div
-                                class="flex items-center justify-center w-12 h-12 transition-transform duration-200 rounded-xl bg-blue-50 dark:bg-blue-900/20 group-hover:scale-105">
-                                <Icon :name="section.icon"
-                                    class="w-6 h-6 text-blue-500 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                    <div class="flex items-center justify-between px-6 py-5">
+                        <button @click="expandedSections[section.id] = !expandedSections[section.id]"
+                            class="flex items-center flex-1 gap-4 text-left transition-colors rounded-xl group">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex items-center justify-center w-12 h-12 transition-transform duration-200 rounded-xl bg-blue-50 dark:bg-blue-900/20 group-hover:scale-105">
+                                    <Icon :name="section.icon"
+                                        class="w-6 h-6 text-blue-500 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-semibold text-gray-900 dark:text-white">{{ section.title }}</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                                        {{ getSectionDescription(section.id) }}
+                                    </p>
+                                </div>
+                                <div v-if="loadingStates[section.id]"
+                                    class="w-5 h-5 ml-4 border-2 border-blue-500 rounded-full border-t-transparent animate-spin">
+                                </div>
                             </div>
-                            <div class="flex-1">
-                                <span class="font-semibold text-gray-900 dark:text-white">{{ section.title }}</span>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
-                                    {{ getSectionDescription(section.id) }}
-                                </p>
-                            </div>
-                            <div v-if="loadingStates[section.id]"
-                                class="w-5 h-5 ml-4 border-2 border-blue-500 rounded-full border-t-transparent animate-spin">
-                            </div>
-                        </div>
-                        <Icon :name="expandedSections[section.id] ? 'mdi:chevron-up' : 'mdi:chevron-down'"
-                            class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                            :class="{ 'rotate-180': expandedSections[section.id] }" />
-                    </button>
+                            <Icon :name="expandedSections[section.id] ? 'mdi:chevron-up' : 'mdi:chevron-down'"
+                                class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                                :class="{ 'rotate-180': expandedSections[section.id] }" />
+                        </button>
+                        
+                        <!-- Add info button -->
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button 
+                                        @click="openInfoModal(section.id)"
+                                        class="p-2 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        <Icon 
+                                            name="mdi:information"
+                                            class="w-5 h-5 text-gray-400 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+                                        />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Learn more about {{ section.title.toLowerCase() }}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
 
                     <div v-if="expandedSections[section.id]"
                         class="px-6 pb-6 divide-y dark:divide-gray-700 animate-fadeIn">
@@ -213,6 +231,13 @@
             </Alert>
         </div>
     </main>
+
+    <!-- Update the modal usage -->
+    <FingerprintInfoModal
+        :is-open="infoModalOpen"
+        :section-id="currentSectionId"
+        @update:open="handleModalClose"
+    />
 </template>
 
 <script setup>
@@ -580,6 +605,20 @@ const toggleColorMode = () => {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
 };
 
+const infoModalOpen = ref(false)
+const currentSectionId = ref('')
+
+const handleModalClose = (value) => {
+  infoModalOpen.value = value
+  if (!value) {
+    currentSectionId.value = ''
+  }
+}
+
+const openInfoModal = (sectionId) => {
+  currentSectionId.value = sectionId
+  infoModalOpen.value = true
+}
 </script>
 <style>
 .fade-enter-active,

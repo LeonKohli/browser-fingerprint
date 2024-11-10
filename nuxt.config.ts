@@ -2,14 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: [
-    '@nuxtjs/tailwindcss',
-    'shadcn-nuxt',
-    '@nuxtjs/color-mode',
-    '@nuxt/icon',
-    '@vueuse/nuxt',
-    '@nuxtjs/seo',
-  ],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/color-mode', '@nuxt/icon', '@vueuse/nuxt', '@nuxtjs/seo', '@nuxt/content'],
   future: {
     compatibilityVersion: 4,
   },
@@ -52,5 +45,10 @@ export default defineNuxtConfig({
         }
       ] : []
     }
+  },
+  content: {
+    highlight: {
+      theme: 'github-dark',
+    },
   },
 })
