@@ -1,8 +1,8 @@
 <template>
-    <div class="min-h-screen p-4 transition-colors duration-200 sm:p-8 dark:bg-gray-900 bg-gray-50">
+    <main class="min-h-screen p-4 transition-colors duration-200 sm:p-8 dark:bg-gray-900 bg-gray-50">
         <div class="max-w-4xl mx-auto space-y-8">
             <StatsBar :fingerprint="fingerprint" :entropy-score="entropyScore" :is-complete="isComplete"
-                :browser-info="browserInfo" :platform-info="platformInfo" />
+                :browser-info="browserInfo" :platform-info="platformInfo" aria-label="Fingerprint Statistics" />
 
             <!-- Header with Fingerprint -->
             <div class="space-y-6 text-center">
@@ -10,6 +10,7 @@
                     <FingerprintIcon :size="64" :scanning="loading" :variant="isComplete ? 'success' : 'default'"
                         :pulse="!isComplete && loading" />
                     <button @click="regenerateFingerprint" :disabled="loading"
+                        data-umami-event="Regenerate Fingerprint"
                         class="absolute flex items-center justify-center w-8 h-8 transition-all duration-200 bg-white border border-gray-200 rounded-full shadow-lg -bottom-2 -right-2 dark:bg-gray-800 hover:shadow-xl dark:border-gray-700 group disabled:opacity-50 disabled:cursor-not-allowed"
                         :class="{ 'animate-spin': loading }">
                         <Icon name="mdi:refresh"
@@ -25,6 +26,7 @@
                             href="https://github.com/LeonKohli/browser-fingerprint"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-umami-event="GitHub Link Click"
                             class="flex items-center gap-2 text-sm text-gray-500 transition-colors duration-200 group dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                         >
                             <div class="flex items-center gap-1.5">
@@ -59,6 +61,7 @@
                     <div
                         class="absolute inset-0 flex items-center justify-center transition-opacity rounded-lg opacity-0 bg-black/50 group-hover:opacity-100">
                         <button @click="handleCopyFingerprint" :disabled="loading"
+                            data-umami-event="Copy Fingerprint"
                             class="flex items-center gap-2 px-4 py-2 text-gray-900 transition-all transform bg-white rounded-lg shadow-lg dark:bg-gray-800 dark:text-white hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                             <Icon :name="isCopied ? 'mdi:check' : 'mdi:clipboard-outline'"
                                 class="w-4 h-4 transition-all"
@@ -209,10 +212,32 @@
                 </template>
             </Alert>
         </div>
-    </div>
+    </main>
 </template>
 
 <script setup>
+const route = useRoute()
+
+// Define SEO metadata
+useSeoMeta({
+  title: 'Browser Fingerprint - Check Your Digital Privacy',
+  description: 'Generate and analyze your unique browser fingerprint. Understand how websites can track you and check your digital privacy score.',
+  keywords: 'browser fingerprint, digital privacy, online tracking, web security, privacy check',
+  robots: 'index, follow',
+  author: 'Browser Fingerprint Team',
+  ogTitle: 'Browser Fingerprint - Check Your Digital Privacy',
+  ogDescription: 'Generate and analyze your unique browser fingerprint. Understand how websites can track you and check your digital privacy score.',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
+
+// Define OG Image
+defineOgImageComponent('NuxtSeo', {
+  title: 'Browser Fingerprint',
+  description: 'Check Your Digital Privacy',
+  colorMode: 'dark',
+  theme: '#3b82f6', // blue-500
+})
 const loading = ref(false);
 const fingerprint = ref(null);
 const expandedSections = ref({});

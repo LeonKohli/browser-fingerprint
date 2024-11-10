@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/icon": "^1.6.1",
     "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/seo": "^2.0.0-rc.23",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@unovis/ts": "^1.5.0-beta.0",
     "@unovis/vue": "^1.5.0-beta.0",

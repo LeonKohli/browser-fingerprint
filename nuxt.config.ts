@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@nuxt/icon',
     '@vueuse/nuxt',
+    '@nuxtjs/seo',
   ],
   future: {
     compatibilityVersion: 4,
@@ -19,5 +20,37 @@ export default defineNuxtConfig({
   colorMode: {
     classPrefix: '',
     classSuffix: '',
+  },
+  site: {
+    url: 'https://fingerprint.leonkohli.dev/',
+    name: 'Browser Fingerprint',
+    description: 'Generate and analyze your unique browser fingerprint. Check your digital privacy and understand how websites can track you.',
+    defaultLocale: 'en',
+  },
+  ogImage: {
+    // Enable dynamic OG image generation
+    enabled: true,
+    defaults: {
+      component: 'NuxtSeo',
+      width: 1200,
+      height: 630,
+    },
+  },
+  runtimeConfig: {
+    public: {
+      umamiWebsiteId: process.env.UMAMI_WEBSITE_ID,
+      umamiHost: process.env.UMAMI_HOST,
+    }
+  },
+  app: {
+    head: {
+      script: [
+        {
+          defer: true,
+          'data-website-id': process.env.UMAMI_WEBSITE_ID,
+          src: `${process.env.UMAMI_HOST}/script.js`,
+        }
+      ]
+    }
   },
 })
