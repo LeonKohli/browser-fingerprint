@@ -45,7 +45,20 @@
                             </span>
                         </a>
                     </div>
-                    <h1 class="text-4xl font-bold tracking-tight dark:text-white">Browser Fingerprint</h1>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <h1 class="text-4xl font-bold tracking-tight dark:text-white cursor-help">
+                                    Browser Fingerprint
+                                </h1>
+                            </TooltipTrigger>
+                            <TooltipContent class="max-w-xs">
+                                <p class="text-sm">
+                                    A browser fingerprint is a collection of unique browser and device characteristics that can be used to identify and track users across the internet, even without cookies.
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                     <div class="flex flex-col items-center space-y-4">
                         <p class="max-w-2xl text-lg text-gray-600 dark:text-gray-400">
                             Your unique browser fingerprint hash:
