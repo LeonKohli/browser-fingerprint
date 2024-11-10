@@ -139,6 +139,7 @@
                                     <button 
                                         @click="openInfoModal(section.id)"
                                         class="p-2 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        data-umami-event="Info Button Click {{ section.title }}"
                                     >
                                         <Icon 
                                             name="mdi:information"
@@ -231,6 +232,7 @@
                 <NuxtLink 
                     to="/privacy-tools"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    data-umami-event="Privacy Tools Link Click"
                 >
                     <Icon name="mdi:shield-lock" class="w-4 h-4" />
                     View Privacy Tools
@@ -239,6 +241,7 @@
                 <NuxtLink 
                     to="/links"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    data-umami-event="Links and Resources Link Click"
                 >
                     <Icon name="mdi:link-variant" class="w-4 h-4" />
                     Links and Resources
