@@ -44,13 +44,13 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      script: [
+      script: process.env.NODE_ENV === 'production' ? [
         {
           defer: true,
           'data-website-id': process.env.UMAMI_WEBSITE_ID,
           src: `${process.env.UMAMI_HOST}/script.js`,
         }
-      ]
+      ] : []
     }
   },
 })
