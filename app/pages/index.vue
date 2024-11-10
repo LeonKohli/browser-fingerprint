@@ -237,6 +237,7 @@ defineOgImageComponent('NuxtSeo', {
   description: 'Check Your Digital Privacy',
   colorMode: 'dark',
   theme: '#3b82f6', // blue-500
+  icon: 'mdi:fingerprint',
 })
 const loading = ref(false);
 const fingerprint = ref(null);
