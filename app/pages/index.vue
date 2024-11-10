@@ -546,7 +546,6 @@ const browserInfo = computed(() => {
     return browserName && browserVersion ? `${browserName} ${browserVersion}` : 'Unknown';
 });
 
-// Add this watch effect after the browserInfo computed property
 watch(fingerprint, (newValue) => {
     try {
         if (newValue) {
@@ -573,18 +572,14 @@ const generateAudioVisualizerData = (audioData) => {
     return data;
 };
 
-// Add near the top of the <script setup> section
 const colorMode = useColorMode();
 
-// Add these computed properties
 const isDark = computed(() => colorMode.value === 'dark');
 
 const toggleColorMode = () => {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
 };
 
-// Add this button in the template section, I suggest placing it in the header area
-// after the fingerprint icon and before the title
 </script>
 <style>
 .fade-enter-active,

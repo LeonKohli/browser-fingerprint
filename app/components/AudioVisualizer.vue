@@ -51,8 +51,7 @@ const drawWaveform = () => {
 
     ctx.stroke()
 
-    // Add a subtle grid (optional)
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)' // slate-400 with low opacity
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)' 
     ctx.lineWidth = 1 * window.devicePixelRatio
 
     // Vertical grid lines
