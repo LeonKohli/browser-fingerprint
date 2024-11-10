@@ -226,6 +226,25 @@
                 </div>
             </div>
 
+            <!-- Navigation Links -->
+            <div class="flex items-center justify-center gap-4">
+                <NuxtLink 
+                    to="/privacy-tools"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                    <Icon name="mdi:shield-lock" class="w-4 h-4" />
+                    View Privacy Tools
+                </NuxtLink>
+
+                <NuxtLink 
+                    to="/links"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                    <Icon name="mdi:link-variant" class="w-4 h-4" />
+                    Links and Resources
+                </NuxtLink>
+            </div>
+
             <!-- Privacy Information Alert -->
             <Alert class="max-w-2xl mx-auto">
                 <template #default>
