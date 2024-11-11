@@ -6,14 +6,13 @@
 [![Nuxt](https://img.shields.io/badge/Nuxt-3.x-00DC82.svg?logo=nuxt.js)](https://nuxt.com/)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D.svg?logo=vue.js)](https://vuejs.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-orange.svg?style=flat&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/LeonKohli)
 
 A modern web application built with Nuxt 3 that analyzes and displays your browser's unique fingerprint. This tool demonstrates various browser fingerprinting techniques and provides detailed insights about your browser's characteristics.
 
-[Demo](https://fingerprint.leonkohli.dev) · [Report Bug](https://github.com/LeonKohli/browser-fingerprint/issues) · [Request Feature](https://github.com/LeonKohli/browser-fingerprint/issues)
+[Demo](https://fingerprint.leonkohli.dev) · [Report Bug](https://github.com/LeonKohli/browser-fingerprint/issues) · [Request Feature](https://github.com/LeonKohli/browser-fingerprint/issues) · [Support Project ☕](https://www.buymeacoffee.com/LeonKohli)
 
 </div>
-
----
 
 ## ✨ Features
 
@@ -160,10 +159,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 The fingerprint generated can potentially be used to track users across websites, even in private browsing mode or when using VPN services. No data is stored or transmitted to external servers.
 
+
 ---
 
 <div align="center">
 
 Made with ❤️ by [LeonKohli](https://github.com/LeonKohli)
+
+If you find this project helpful, consider [buying me a coffee ☕](https://www.buymeacoffee.com/LeonKohli)
 
 </div>

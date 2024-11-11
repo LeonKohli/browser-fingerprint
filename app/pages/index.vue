@@ -228,7 +228,7 @@
             </div>
 
             <!-- Navigation Links -->
-            <div class="flex items-center justify-center gap-4">
+            <div class="flex flex-wrap items-center justify-center gap-4">
                 <NuxtLink 
                     to="/privacy-tools"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -246,6 +246,17 @@
                     <Icon name="mdi:link-variant" class="w-4 h-4" />
                     Links and Resources
                 </NuxtLink>
+
+                <a 
+                    href="https://www.buymeacoffee.com/LeonKohli"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-800 transition-colors bg-yellow-100 border border-yellow-200 rounded-lg shadow-sm hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-900/50 dark:hover:bg-yellow-900/50"
+                    data-umami-event="Buy Me a Coffee Click"
+                >
+                    <Icon name="mdi:coffee" class="w-4 h-4" />
+                    Buy Me a Coffee
+                </a>
             </div>
 
             <!-- Privacy Information Alert -->
