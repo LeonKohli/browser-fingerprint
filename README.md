@@ -10,7 +10,7 @@
 
 A modern web application built with Nuxt 3 that analyzes and displays your browser's unique fingerprint. This tool demonstrates various browser fingerprinting techniques and provides detailed insights about your browser's characteristics.
 
-[Demo](https://fingerprint.leonkohli.dev) · [Report Bug](https://github.com/LeonKohli/browser-fingerprint/issues) · [Request Feature](https://github.com/LeonKohli/browser-fingerprint/issues) · [Support Project ☕](https://www.buymeacoffee.com/LeonKohli)
+[Demo](https://trackme.dev) · [Report Bug](https://github.com/LeonKohli/browser-fingerprint/issues) · [Request Feature](https://github.com/LeonKohli/browser-fingerprint/issues) · [Support Project ☕](https://www.buymeacoffee.com/LeonKohli)
 
 </div>
 

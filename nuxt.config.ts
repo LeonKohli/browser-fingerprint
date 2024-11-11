@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     classSuffix: '',
   },
   site: {
-    url: 'https://fingerprint.leonkohli.dev/',
+    url: 'https://trackme.dev/',
     name: 'Browser Fingerprint',
     description: 'Generate and analyze your unique browser fingerprint. Check your digital privacy and understand how websites can track you.',
     defaultLocale: 'en',

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://fingerprint.leonkohli.dev/sitemap.xml
+Sitemap: https://trackme.dev/sitemap.xml
