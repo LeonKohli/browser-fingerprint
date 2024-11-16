@@ -6,7 +6,6 @@
 [![Nuxt](https://img.shields.io/badge/Nuxt-3.x-00DC82.svg?logo=nuxt.js)](https://nuxt.com/)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D.svg?logo=vue.js)](https://vuejs.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-orange.svg?style=flat&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/LeonKohli)
 
 A modern web application built with Nuxt 3 that analyzes and displays your browser's unique fingerprint. This tool demonstrates various browser fingerprinting techniques and provides detailed insights about your browser's characteristics.
 
