@@ -1,4 +1,9 @@
 <template>
+    <noscript>
+<div class="p-4 text-center text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400">
+JavaScript is required to use this website. Please enable JavaScript in your browser settings.
+</div>
+</noscript>
     <main class="min-h-screen p-4 transition-colors duration-200 sm:p-8 dark:bg-gray-900 bg-gray-50">
         <div class="max-w-4xl mx-auto space-y-8">
             <StatsBar :fingerprint="fingerprint" :entropy-score="entropyScore" :is-complete="isComplete"
