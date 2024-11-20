@@ -80,23 +80,20 @@ export function useFingerprintHelpers() {
         if (!process.client) return false;
 
         try {
-            const testKey = '__private_test__';
-            localStorage.setItem(testKey, testKey);
-            localStorage.removeItem(testKey);
-
-            const db = await new Promise((resolve) => {
-                const req = indexedDB.open('__private_test__');
-                req.onerror = () => resolve(false);
-                req.onsuccess = () => {
-                    req.result.close();
-                    indexedDB.deleteDatabase('__private_test__');
-                    resolve(true);
-                };
-            });
-
-            return !db;
-        } catch (e) {
-            return true;
+            const { detectIncognito } = useIncognitoDetection();
+            const { isPrivate } = await detectIncognito();
+            return isPrivate;
+        } catch (error) {
+            console.error('Error detecting private mode:', error);
+            // Fallback to basic detection if the main method fails
+            try {
+                const testKey = '__private_test__';
+                localStorage.setItem(testKey, testKey);
+                localStorage.removeItem(testKey);
+                return false;
+            } catch {
+                return true;
+            }
         }
     };
 
