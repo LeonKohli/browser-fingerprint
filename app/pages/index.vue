@@ -15,7 +15,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                     <FingerprintIcon :size="64" :scanning="loading" :variant="isComplete ? 'success' : 'default'"
                         :pulse="!isComplete && loading" />
                     <button @click="regenerateFingerprint" :disabled="loading"
-                        data-umami-event="Regenerate Fingerprint"
+                        v-umami="'Regenerate Fingerprint'"
                         class="absolute flex items-center justify-center w-8 h-8 transition-all duration-200 bg-white border border-gray-200 rounded-full shadow-lg -bottom-2 -right-2 dark:bg-gray-800 hover:shadow-xl dark:border-gray-700 group disabled:opacity-50 disabled:cursor-not-allowed"
                         :class="{ 'animate-spin': loading }">
                         <Icon name="mdi:refresh"
@@ -31,7 +31,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                             href="https://github.com/LeonKohli/browser-fingerprint"
                             target="_blank"
                             rel="noopener noreferrer"
-                            data-umami-event="GitHub Link Click"
+                            v-umami="'GitHub Link Click'"
                             class="flex items-center gap-2 text-sm text-gray-500 transition-colors duration-200 group dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                         >
                             <div class="flex items-center gap-1.5">
@@ -79,7 +79,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                     <div
                         class="absolute inset-0 flex items-center justify-center transition-opacity rounded-lg opacity-0 bg-black/50 group-hover:opacity-100">
                         <button @click="handleCopyFingerprint" :disabled="loading"
-                            data-umami-event="Copy Fingerprint"
+                            v-umami="'Copy Fingerprint'"
                             class="flex items-center gap-2 px-4 py-2 text-gray-900 transition-all transform bg-white rounded-lg shadow-lg dark:bg-gray-800 dark:text-white hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                             <Icon :name="isCopied ? 'mdi:check' : 'mdi:clipboard-outline'"
                                 class="w-4 h-4 transition-all"
@@ -144,7 +144,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                                     <button 
                                         @click="openInfoModal(section.id)"
                                         class="p-2 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        data-umami-event="Info Button Click {{ section.title }}"
+                                        v-umami="{ name: 'Info Button Click', sectionTitle: section.title }"
                                     >
                                         <Icon 
                                             name="mdi:information"
@@ -237,7 +237,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                 <NuxtLink 
                     to="/privacy-tools"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    data-umami-event="Privacy Tools Link Click"
+                    v-umami="'Privacy Tools Link Click'"
                 >
                     <Icon name="mdi:shield-lock" class="w-4 h-4" />
                     View Privacy Tools
@@ -246,7 +246,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                 <NuxtLink 
                     to="/links"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    data-umami-event="Links and Resources Link Click"
+                    v-umami="'Links and Resources Link Click'"
                 >
                     <Icon name="mdi:link-variant" class="w-4 h-4" />
                     Links and Resources
@@ -257,7 +257,7 @@ JavaScript is required to use this website. Please enable JavaScript in your bro
                     target="_blank"
                     rel="noopener noreferrer"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-800 transition-colors bg-yellow-100 border border-yellow-200 rounded-lg shadow-sm hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-900/50 dark:hover:bg-yellow-900/50"
-                    data-umami-event="Buy Me a Coffee Click"
+                    v-umami="'Buy Me a Coffee Click'"
                 >
                     <Icon name="mdi:coffee" class="w-4 h-4" />
                     Buy Me a Coffee
