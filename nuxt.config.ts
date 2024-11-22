@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/color-mode', '@nuxt/icon', '@vueuse/nuxt', '@nuxtjs/seo', '@nuxt/content'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/color-mode', '@nuxt/icon', '@vueuse/nuxt', '@nuxtjs/seo', '@nuxt/content', 'nuxt-umami'],
   future: {
     compatibilityVersion: 4,
   },
@@ -35,20 +35,23 @@ export default defineNuxtConfig({
       umamiHost: process.env.UMAMI_HOST,
     }
   },
-  app: {
-    head: {
-      script: process.env.NODE_ENV === 'production' ? [
-        {
-          defer: true,
-          'data-website-id': process.env.UMAMI_WEBSITE_ID,
-          src: `${process.env.UMAMI_HOST}/script.js`,
-        }
-      ] : []
-    }
-  },
   content: {
     highlight: {
       theme: 'github-dark',
     },
+  },
+
+  umami: {
+    id: process.env.UMAMI_WEBSITE_ID,
+    host: process.env.UMAMI_HOST,
+    autoTrack: true,
+    ignoreLocalhost: true,
+    // proxy: 'cloak',
+    // useDirective: true,
+    // excludeQueryParams: false,
+    // domains: ['cool-site.app', 'my-space.site'],
+    // customEndpoint: '/my-custom-endpoint',
+    // enabled: false,
+    // logErrors: true,
   },
 })
