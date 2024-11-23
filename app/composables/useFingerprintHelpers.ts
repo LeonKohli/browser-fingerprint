@@ -1,11 +1,4 @@
-interface BrowserInfo {
-    browserName: string;
-    version: string;
-}
-
 export function useFingerprintHelpers() {
-    const isCopied = ref(false);
-
     const formatKey = (key: string): string => {
         return key
             .replace(/([A-Z])/g, ' $1')
@@ -18,115 +11,10 @@ export function useFingerprintHelpers() {
 
         try {
             await navigator.clipboard.writeText(hash);
-            isCopied.value = true;
-            setTimeout(() => {
-                isCopied.value = false;
-            }, 2000);
+            // Handle success (e.g., show a notification)
         } catch (error) {
             console.error('Failed to copy:', error);
         }
-    };
-
-    const detectBrowserInfo = (): BrowserInfo => {
-        if (!process.client) {
-            return { browserName: 'Unknown', version: 'Unknown' };
-        }
-
-        const ua = navigator.userAgent;
-        let browserName = 'Unknown';
-        let version = 'Unknown';
-
-        // Detect browser name
-        if (ua.match(/chrome|chromium|crios/i)) {
-            if (ua.match(/edg/i)) browserName = 'Edge';
-            else if (ua.match(/opr\//i)) browserName = 'Opera';
-            else browserName = 'Chrome';
-        } else if (ua.match(/firefox|fxios/i)) {
-            browserName = 'Firefox';
-        } else if (ua.match(/safari/i)) {
-            browserName = 'Safari';
-        } else if (ua.match(/trident/i)) {
-            browserName = 'Internet Explorer';
-        }
-
-        if (ua.match(/mobile/i)) {
-            browserName += ' Mobile';
-        }
-
-        // Detect version
-        let match = ua.match(/(edg(?:e|ios|a)?)\/(\d+(\.\d+)*)/i);
-        if (match && match[2]) version = match[2];
-        else {
-            match = ua.match(/(chrome|chromium|crios)\/(\d+(\.\d+)*)/i);
-            if (match && match[2]) version = match[2];
-            else {
-                match = ua.match(/(firefox|fxios)\/(\d+(\.\d+)*)/i);
-                if (match && match[2]) version = match[2];
-                else {
-                    match = ua.match(/version\/(\d+(\.\d+)*)/i);
-                    if (match && match[1] && ua.includes('safari')) version = match[1];
-                    else {
-                        match = ua.match(/(?:ms|\()ie\s(\d+(\.\d+)*)/i);
-                        if (match && match[1]) version = match[1];
-                    }
-                }
-            }
-        }
-
-        return { browserName, version };
-    };
-
-    const detectPrivateMode = async (): Promise<boolean> => {
-        if (!process.client) return false;
-
-        try {
-            const { detectIncognito } = useIncognitoDetection();
-            const { isPrivate } = await detectIncognito();
-            return isPrivate;
-        } catch (error) {
-            console.error('Error detecting private mode:', error);
-            // Fallback to basic detection if the main method fails
-            try {
-                const testKey = '__private_test__';
-                localStorage.setItem(testKey, testKey);
-                localStorage.removeItem(testKey);
-                return false;
-            } catch {
-                return true;
-            }
-        }
-    };
-
-    const getHardwareInfo = () => {
-        if (!process.client) {
-            return {
-                deviceMemory: null,
-                hardwareConcurrency: null,
-                cpuCores: null,
-                maxTouchPoints: 0,
-                battery: false,
-                bluetooth: false,
-                gamepads: false,
-                mediaCapabilities: false,
-                scheduling: false,
-                virtualReality: false,
-                wakeLock: false
-            };
-        }
-
-        return {
-            deviceMemory: (navigator as any).deviceMemory || null,
-            hardwareConcurrency: navigator.hardwareConcurrency || null,
-            cpuCores: navigator.hardwareConcurrency || null,
-            maxTouchPoints: navigator.maxTouchPoints || 0,
-            battery: 'getBattery' in navigator,
-            bluetooth: 'bluetooth' in navigator,
-            gamepads: 'getGamepads' in navigator,
-            mediaCapabilities: 'mediaCapabilities' in navigator,
-            scheduling: 'scheduling' in navigator,
-            virtualReality: 'xr' in navigator,
-            wakeLock: 'wakeLock' in navigator
-        };
     };
 
     const getSectionDescription = (sectionId: string): string => {
@@ -142,12 +30,8 @@ export function useFingerprintHelpers() {
     };
 
     return {
-        isCopied,
         formatKey,
         copyFingerprint,
-        detectBrowserInfo,
-        detectPrivateMode,
-        getHardwareInfo,
         getSectionDescription
     };
 } 
