@@ -101,6 +101,7 @@ interface Fingerprint {
     browser?: {
         vendor?: string;
         platform?: string;
+        userAgent?: string;
     };
 }
 
@@ -108,8 +109,6 @@ interface Props {
     fingerprint: Fingerprint | null;
     entropyScore: number;
     isComplete: boolean;
-    browserInfo: string;
-    platformInfo: string;
 }
 
 const props = defineProps<Props>();
@@ -127,5 +126,27 @@ const uniquenessMessage = computed(() => {
     } else {
         return 'Your fingerprint appears similar to many other users, which may help blend in.';
     }
+});
+
+const browserInfo = computed(() => {
+    if (!props.fingerprint?.browser) return 'Unknown';
+    const ua = props.fingerprint.browser.userAgent || '';
+    const match = ua.match(/(Chrome|Firefox|Safari|Opera|Edge|IE)\/?\s*(\d+)/i);
+    return match ? `${match[1]} ${match[2]}` : 'Unknown browser';
+});
+
+const platformInfo = computed(() => {
+    if (!props.fingerprint?.browser) return 'Unknown';
+    const platform = props.fingerprint.browser.platform;
+    const ua = props.fingerprint.browser.userAgent || '';
+
+    const osMatch = ua.match(/(Windows NT|Mac OS X|Linux|Android|iOS) ?([0-9._]+)?/);
+    if (osMatch) {
+        const os = osMatch[1];
+        const version = osMatch[2] ? ` ${osMatch[2].replace(/_/g, '.')}` : '';
+        return `${os}${version}`;
+    }
+
+    return platform || 'Unknown';
 });
 </script>

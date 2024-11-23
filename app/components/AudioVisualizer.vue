@@ -1,14 +1,28 @@
 <script setup lang="ts">
 interface Props {
-    data: number[]
+    audioData: { hash: number } | null
 }
 
 const props = defineProps<Props>()
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
+const generateVisualizationData = (audioData: { hash: number } | null): number[] => {
+    if (!audioData || typeof audioData.hash !== 'number') {
+        return new Array(50).fill(0);
+    }
+    
+    const hashString = audioData.hash.toString();
+    const data = [];
+    for (let i = 0; i < 50; i++) {
+        const value = (parseInt(hashString.slice(i % hashString.length, (i % hashString.length) + 1)) / 10) - 0.5;
+        data.push(value);
+    }
+    return data;
+}
+
 const drawWaveform = () => {
     const canvas = canvasRef.value
-    if (!canvas || !props.data.length) return
+    if (!canvas) return
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
@@ -34,12 +48,13 @@ const drawWaveform = () => {
     const drawingHeight = height - (padding * 2)
     const middle = height / 2
 
-    // Draw the waveform
+    // Generate and draw the waveform
+    const data = generateVisualizationData(props.audioData)
     ctx.beginPath()
     ctx.moveTo(padding, middle)
 
-    const step = drawingWidth / (props.data.length - 1)
-    props.data.forEach((value, index) => {
+    const step = drawingWidth / (data.length - 1)
+    data.forEach((value, index) => {
         const x = padding + (index * step)
         const y = middle + (value * drawingHeight / 2)
         if (index === 0) {
@@ -71,8 +86,8 @@ const drawWaveform = () => {
     }
 }
 
-// Watch for data changes and redraw
-watch(() => props.data, drawWaveform, { immediate: true })
+// Watch for audioData changes and redraw
+watch(() => props.audioData, drawWaveform, { immediate: true })
 
 // Handle resize events
 onMounted(() => {
