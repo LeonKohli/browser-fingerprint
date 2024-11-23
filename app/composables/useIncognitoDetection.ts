@@ -1,3 +1,5 @@
+// This code is adapted from https://github.com/Joe12387/detectIncognito.
+
 interface IncognitoDetectionResult {
     isPrivate: boolean;
     browserName: string;
