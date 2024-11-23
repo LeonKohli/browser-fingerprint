@@ -3,130 +3,206 @@ interface IncognitoDetectionResult {
     browserName: string;
 }
 
-interface BrowserTestFunctions {
-    test: (callback: (isPrivate: boolean) => void) => void;
-    identify?: () => string;
-}
-
 export function useIncognitoDetection() {
     const detectIncognito = async (): Promise<IncognitoDetectionResult> => {
-        if (!process.client) {
+        if (!import.meta.client) {
             return { isPrivate: false, browserName: 'Unknown' };
         }
 
-        const getBrowserType = (): string => {
-            const toFixedLength = (() => {
+        return new Promise((resolve, reject) => {
+            let browserName = 'Unknown';
+
+            const __callback = (isPrivate: boolean): void => {
+                resolve({
+                    isPrivate,
+                    browserName
+                });
+            };
+
+            const identifyChromium = (): string => {
+                const ua = navigator.userAgent;
+                if (ua.match(/Chrome/)) {
+                    if ((navigator as any).brave !== undefined) {
+                        return 'Brave';
+                    } else if (ua.match(/Edg/)) {
+                        return 'Edge';
+                    } else if (ua.match(/OPR/)) {
+                        return 'Opera';
+                    }
+                    return 'Chrome';
+                } else {
+                    return 'Chromium';
+                }
+            };
+
+            const assertEvalToString = (value: number): boolean => {
+                return value === eval.toString().length;
+            };
+
+            const feid = (): number => {
+                let toFixedEngineID = 0;
                 try {
-                    (-1).toFixed(-1);
+                    eval(`(-1).toFixed(-1);`);
                 } catch (e) {
-                    return (e as Error).message.length;
+                    toFixedEngineID = (e as Error).message.length; // Safari 44, Chrome 51, Firefox 25
                 }
-                return 0;
-            })();
+                return toFixedEngineID;
+            };
+            
+            const isSafari = (): boolean => feid() === 44;
+            const isChrome = (): boolean => feid() === 51;
+            const isFirefox = (): boolean => feid() === 25;
+            const isMSIE = (): boolean => (navigator as any).msSaveBlob !== undefined && assertEvalToString(39);
 
-            if (toFixedLength === 44) return 'Safari';
-            if (toFixedLength === 51) return 'Chrome';
-            if (toFixedLength === 25) return 'Firefox';
-            if ((navigator as any).msSaveBlob !== undefined && eval.toString().length === 39) return 'IE';
-            return 'Unknown';
-        };
+            const newSafariTest = (): void => {
+                const tmp_name = String(Math.random());
 
-        const identifyChromium = (): string => {
-            const ua = navigator.userAgent;
-            if (!ua.match(/Chrome/)) return 'Chromium';
-            if ((navigator as any).brave !== undefined) return 'Brave';
-            if (ua.match(/Edg/)) return 'Edge';
-            if (ua.match(/OPR/)) return 'Opera';
-            return 'Chrome';
-        };
+                try {
+                    const db = window.indexedDB.open(tmp_name, 1);
 
-        const browserTests: Record<string, BrowserTestFunctions> = {
-            Safari: {
-                test: (callback: (isPrivate: boolean) => void) => {
-                    if (navigator.maxTouchPoints !== undefined) {
-                        const dbName = `test_${Math.random()}`;
+                    db.onupgradeneeded = function (i) {
+                        const res = i.target as IDBDatabase;
+
                         try {
-                            const db = window.indexedDB.open(dbName, 1);
-                            db.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-                                const db = (event.target as IDBOpenDBRequest).result;
-                                try {
-                                    db.createObjectStore('test', { autoIncrement: true }).put(new Blob());
-                                    callback(false);
-                                } catch (e) {
-                                    const error = e instanceof Error ? e.message : String(e);
-                                    callback(error.includes('BlobURLs are not yet supported'));
-                                } finally {
-                                    db.close();
-                                    window.indexedDB.deleteDatabase(dbName);
-                                }
-                            };
-                        } catch {
-                            callback(false);
+                            res.createObjectStore('test', {
+                                autoIncrement: true
+                            }).put(new Blob());
+
+                            __callback(false);
+                        } catch (e) {
+                            let message = e;
+
+                            if (e instanceof Error) {
+                                message = e.message ?? e;
+                            }
+
+                            if (typeof message !== 'string') {
+                                __callback(false); return;
+                            }
+
+                            const matchesExpectedError = message.includes('BlobURLs are not yet supported');
+
+                            __callback(matchesExpectedError); return;
+                        } finally {
+                            res.close();
+                            window.indexedDB.deleteDatabase(tmp_name);
                         }
-                    } else {
-                        try {
-                            (window as any).openDatabase(null, null, null, null);
-                            localStorage.setItem('test', '1');
-                            localStorage.removeItem('test');
-                            callback(false);
-                        } catch {
-                            callback(true);
-                        }
-                    }
-                }
-            },
-            Chrome: {
-                test: (callback: (isPrivate: boolean) => void) => {
-                    const getQuotaLimit = (): number => {
-                        const memory = (performance as any).memory;
-                        return memory?.jsHeapSizeLimit || 1073741824;
                     };
+                } catch (e) {
+                    __callback(false);
+                }
+            };
 
-                    if (self.Promise && (self.Promise as any).allSettled) {
-                        (navigator as any).webkitTemporaryStorage.queryUsageAndQuota(
-                            (_: number, quota: number) => {
-                                const quotaInMib = Math.round(quota / (1024 * 1024));
-                                const limitInMib = Math.round(getQuotaLimit() / (1024 * 1024)) * 2;
-                                callback(quotaInMib < limitInMib);
-                            },
-                            () => callback(true)
+            const oldSafariTest = (): void => {
+                const openDB = (window as any).openDatabase;
+                const storage = window.localStorage;
+                try {
+                    openDB(null, null, null, null);
+                } catch (e) {
+                    __callback(true); return;
+                }
+                try {
+                    storage.setItem('test', '1');
+                    storage.removeItem('test');
+                } catch (e) {
+                    __callback(true); return;
+                }
+                __callback(false);
+            };
+
+            const safariPrivateTest = (): void => {
+                if (navigator.maxTouchPoints !== undefined) {
+                    newSafariTest();
+                } else {
+                    oldSafariTest();
+                }
+            };
+
+            const getQuotaLimit = (): number => {
+                const w = window as any;
+                if (
+                    w.performance !== undefined &&
+                    w.performance.memory !== undefined &&
+                    w.performance.memory.jsHeapSizeLimit !== undefined
+                ) {
+                    return (performance as any).memory.jsHeapSizeLimit;
+                }
+                return 1073741824;
+            };
+
+            const storageQuotaChromePrivateTest = (): void => {
+                (navigator as any).webkitTemporaryStorage.queryUsageAndQuota(
+                    function (_: number, quota: number) {
+                        const quotaInMib = Math.round(quota / (1024 * 1024));
+                        const quotaLimitInMib = Math.round(getQuotaLimit() / (1024 * 1024)) * 2;
+
+                        __callback(quotaInMib < quotaLimitInMib);
+                    },
+                    function (e: any) {
+                        reject(
+                            new Error(
+                                'detectIncognito somehow failed to query storage quota: ' +
+                                    e.message
+                            )
                         );
-                    } else {
-                        const fs = (window as any).webkitRequestFileSystem;
-                        fs(0, 1, () => callback(false), () => callback(true));
                     }
-                },
-                identify: identifyChromium
-            },
-            Firefox: {
-                test: (callback: (isPrivate: boolean) => void) => {
-                    callback(navigator.serviceWorker === undefined);
+                );
+            };
+
+            const oldChromePrivateTest = (): void => {
+                const fs = (window as any).webkitRequestFileSystem;
+                const success = function () {
+                    __callback(false);
+                };
+                const error = function () {
+                    __callback(true);
+                };
+                fs(0, 1, success, error);
+            };
+
+            const chromePrivateTest = (): void => {
+                if (self.Promise !== undefined && (self.Promise as any).allSettled !== undefined) {
+                    storageQuotaChromePrivateTest();
+                } else {
+                    oldChromePrivateTest();
                 }
-            },
-            IE: {
-                test: (callback: (isPrivate: boolean) => void) => {
-                    callback(window.indexedDB === undefined);
+            };
+
+            const firefoxPrivateTest = (): void => {
+                __callback(navigator.serviceWorker === undefined);
+            };
+
+            const msiePrivateTest = (): void => {
+                __callback(window.indexedDB === undefined);
+            };
+
+            const main = (): void => {
+                if (isSafari()) {
+                    browserName = 'Safari';
+                    safariPrivateTest();
+                } else if (isChrome()) {
+                    browserName = identifyChromium();
+                    chromePrivateTest();
+                } else if (isFirefox()) {
+                    browserName = 'Firefox';
+                    firefoxPrivateTest();
+                } else if (isMSIE()) {
+                    browserName = 'Internet Explorer';
+                    msiePrivateTest();
+                } else {
+                    reject(new Error('detectIncognito cannot determine the browser'));
                 }
-            }
-        };
+            };
 
-        return new Promise((resolve) => {
-            const browserType = getBrowserType();
-            const browserTest = browserTests[browserType];
-
-            if (!browserTest) {
-                resolve({ isPrivate: false, browserName: 'Unknown' });
-                return;
-            }
-
-            const browserName = browserTest.identify?.() || browserType;
-            browserTest.test((isPrivate: boolean) => {
-                resolve({ isPrivate, browserName });
-            });
+            main();
         });
     };
 
     return {
         detectIncognito
     };
+}
+
+if (import.meta.client) {
+    (window as any).detectIncognito = useIncognitoDetection().detectIncognito;
 }
