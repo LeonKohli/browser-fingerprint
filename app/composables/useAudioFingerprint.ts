@@ -8,58 +8,73 @@ export function useAudioFingerprint() {
     const getAudioFingerprint = async (): Promise<AudioFingerprintData | null> => {
         if (!isSupported.value) return null;
 
-        try {
-            // Get appropriate AudioContext constructor
-            const AudioContextClass = window.OfflineAudioContext;
-            if (!AudioContextClass) {
-                return null;
-            }
+        return new Promise((resolve) => {
+            const { start, stop } = useTimeoutFn(() => {
+                console.warn('Audio fingerprint generation timed out')
+                resolve(null)
+            }, 5000)
 
-            // Create audio context
-            const context = new AudioContextClass(1, 5000, 44100);
+            start()
 
-            // Create oscillator
-            const oscillator = context.createOscillator();
-            oscillator.type = "triangle";
-            oscillator.frequency.value = 1000;
+            const generateFingerprint = async () => {
+                try {
+                    // Get appropriate AudioContext constructor
+                    const AudioContextClass = window.OfflineAudioContext;
+                    if (!AudioContextClass) {
+                        return null;
+                    }
 
-            // Create compressor
-            const compressor = context.createDynamicsCompressor();
-            compressor.threshold.value = -50;
-            compressor.knee.value = 40;
-            compressor.ratio.value = 12;
-            compressor.attack.value = 0;
-            compressor.release.value = 0.2;
+                    // Create audio context
+                    const context = new AudioContextClass(1, 5000, 44100);
 
-            // Connect nodes
-            oscillator.connect(compressor);
-            compressor.connect(context.destination);
+                    // Create oscillator
+                    const oscillator = context.createOscillator();
+                    oscillator.type = "triangle";
+                    oscillator.frequency.value = 1000;
 
-            // Start oscillator
-            oscillator.start();
+                    // Create compressor
+                    const compressor = context.createDynamicsCompressor();
+                    compressor.threshold.value = -50;
+                    compressor.knee.value = 40;
+                    compressor.ratio.value = 12;
+                    compressor.attack.value = 0;
+                    compressor.release.value = 0.2;
 
-            // Render audio and calculate hash
-            const buffer = await new Promise<AudioBuffer>((resolve) => {
-                context.oncomplete = (event) => resolve(event.renderedBuffer);
-                context.startRendering();
-            });
+                    // Connect nodes
+                    oscillator.connect(compressor);
+                    compressor.connect(context.destination);
 
-            // Get samples and calculate hash
-            const samples = buffer.getChannelData(0);
-            let hash = 0;
-            for (let i = 0; i < samples.length; ++i) {
-                const sample = samples[i];
-                if (typeof sample === 'number') {
-                    hash += Math.abs(sample);
+                    // Start oscillator
+                    oscillator.start();
+
+                    // Render audio and calculate hash
+                    const buffer = await new Promise<AudioBuffer>((resolve) => {
+                        context.oncomplete = (event) => resolve(event.renderedBuffer);
+                        context.startRendering();
+                    });
+
+                    // Get samples and calculate hash
+                    const samples = buffer.getChannelData(0);
+                    let hash = 0;
+                    for (let i = 0; i < samples.length; ++i) {
+                        const sample = samples[i];
+                        if (typeof sample === 'number') {
+                            hash += Math.abs(sample);
+                        }
+                    }
+
+                    return { hash };
+                } catch (error) {
+                    console.error('Error generating audio fingerprint:', error);
+                    return null;
                 }
-            }
+            };
 
-            return { hash };
-
-        } catch (error) {
-            console.error('Error generating audio fingerprint:', error);
-            return null;
-        }
+            generateFingerprint().then((result) => {
+                stop();
+                resolve(result);
+            });
+        });
     };
 
     return {

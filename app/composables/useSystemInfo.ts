@@ -27,8 +27,9 @@ export function useSystemInfo() {
     const preferredLanguages = usePreferredLanguages()
     const memory = useMemory()
     const battery = useBattery()
-    const devicePixelRatio = useDevicePixelRatio()
+    const { pixelRatio } = useDevicePixelRatio()
     const screenOrientation = useScreenOrientation()
+    const windowSize = useWindowSize()
 
     const getSystemInfo = async () => {
         if (!import.meta.client) {
@@ -80,6 +81,8 @@ export function useSystemInfo() {
                 colorDepth: 0,
                 pixelRatio: 1,
                 orientation: 'unknown',
+                windowWidth: 0,
+                windowHeight: 0,
             }
         }
 
@@ -87,8 +90,10 @@ export function useSystemInfo() {
             width: window.screen.width,
             height: window.screen.height,
             colorDepth: window.screen.colorDepth,
-            pixelRatio: devicePixelRatio.pixelRatio,
-            orientation: screenOrientation.orientation.value || 'unknown',
+            pixelRatio: pixelRatio.value,
+            orientation: screenOrientation.orientation?.value || 'unknown',
+            windowWidth: windowSize.width.value,
+            windowHeight: windowSize.height.value,
         }
     }
 
