@@ -104,7 +104,7 @@ import { ClientOnly } from '../../.nuxt/components';
                 <div v-for="section in sections" :key="section.id"
                     class="transition-all duration-200 bg-white border border-gray-100 shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md dark:border-gray-700">
                     <div class="flex items-center justify-between px-6 py-5">
-                        <button @click="expandedSections[section.id] = !expandedSections[section.id]"
+                        <button @click="toggleSection(section.id)"
                             class="flex items-center flex-1 gap-4 text-left transition-colors rounded-xl group">
                             <div class="flex items-center gap-4">
                                 <div
@@ -118,30 +118,24 @@ import { ClientOnly } from '../../.nuxt/components';
                                         {{ getSectionDescription(section.id) }}
                                     </p>
                                 </div>
-                                <div v-if="loadingStates[section.id]"
-                                    class="w-5 h-5 ml-4 border-2 border-blue-500 rounded-full border-t-transparent animate-spin">
-                                </div>
                             </div>
-                            <Icon :name="expandedSections[section.id] ? 'mdi:chevron-up' : 'mdi:chevron-down'"
+                            <Icon name="mdi:chevron-down"
                                 class="w-5 h-5 text-gray-400 transition-transform duration-200"
                                 :class="{ 'rotate-180': expandedSections[section.id] }" />
                         </button>
                         
-                        <!-- Add info button -->
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button 
-                                        @click="openInfoModal(section.id)"
-                                        class="p-2 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                        @click.stop="openInfoModal(section.id)"
+                                        class="flex items-center justify-center w-8 h-8 ml-4 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                                         v-umami="{ name: 'Info Button Click', sectionTitle: section.title }"
                                     >
-                                        <div class="flex items-center justify-center w-5 h-5">
-                                            <Icon 
-                                                name="mdi:information"
-                                                class="w-5 h-5 text-gray-400 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
-                                            />
-                                        </div>
+                                        <Icon 
+                                            name="mdi:information"
+                                            class="w-5 h-5 text-gray-400 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+                                        />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -151,82 +145,85 @@ import { ClientOnly } from '../../.nuxt/components';
                         </TooltipProvider>
                     </div>
 
-                    <div v-if="expandedSections[section.id]"
-                        class="px-6 pb-6 divide-y dark:divide-gray-700 animate-fadeIn">
-                        <div v-if="loadingStates[section.id]" class="py-8 text-center text-gray-500 dark:text-gray-400">
-                            <div class="flex flex-col items-center gap-3">
-                                <div
-                                    class="w-8 h-8 border-blue-500 rounded-full border-3 border-t-transparent animate-spin">
+                    <Transition
+                        enter-active-class="transition-all duration-300 ease-out"
+                        enter-from-class="opacity-0 max-h-0"
+                        enter-to-class="max-h-[2000px] opacity-100"
+                        leave-active-class="transition-all duration-300 ease-in"
+                        leave-from-class="max-h-[2000px] opacity-100"
+                        leave-to-class="opacity-0 max-h-0"
+                    >
+                        <div v-if="expandedSections[section.id]"
+                            class="px-6 pb-6 overflow-hidden divide-y dark:divide-gray-700">
+                            <div v-if="loadingStates[section.id]" class="py-4">
+                                <div class="space-y-3">
+                                    <Skeleton class="w-2/3 h-4" />
+                                    <Skeleton class="w-5/6 h-4" />
+                                    <Skeleton class="w-4/5 h-4" />
                                 </div>
-                                <p>Loading {{ section.title.toLowerCase() }}...</p>
                             </div>
-                        </div>
-                        <template v-else-if="fingerprint && fingerprint[section.id]">
-                            <p v-if="sectionHasIssues(section.id)" class="mt-2 mb-4 text-sm text-yellow-600 dark:text-yellow-400">
-                                Note: Some data in this section may be incomplete or unavailable due to browser restrictions or privacy settings.
-                            </p>
-                            <template v-for="(value, key) in fingerprint[section.id]" :key="key">
-                                <div class="py-4 first:pt-4">
-                                    <div class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
-                                        {{ formatKey(key) }}
-                                    </div>
-                                    <div class="text-sm text-gray-900 dark:text-gray-200">
-                                        <template v-if="Array.isArray(value)">
-                                            <div class="space-y-2">
-                                                <div v-for="(item, i) in value" :key="i"
-                                                    class="flex items-center gap-2.5">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                                    <template v-if="typeof item === 'object'">
-                                                        <div class="space-y-1">
-                                                            <div v-for="(val, k) in item" :key="k"
-                                                                class="text-gray-700 dark:text-gray-300">
-                                                                <span class="font-medium">{{ formatKey(k) }}:</span> {{
-                                                                    val }}
-                                                            </div>
+                            <template v-else-if="fingerprint && fingerprint[section.id]">
+                                <p v-if="sectionHasIssues(section.id)" class="py-4 text-sm text-yellow-600 dark:text-yellow-400">
+                                    Note: Some data in this section may be incomplete or unavailable due to browser restrictions or privacy settings.
+                                </p>
+                                <div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2">
+                                    <template v-for="(value, key) in fingerprint[section.id]" :key="key">
+                                        <div class="space-y-2">
+                                            <div class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                                {{ formatKey(key) }}
+                                            </div>
+                                            <div class="text-sm text-gray-900 dark:text-gray-200">
+                                                <template v-if="Array.isArray(value)">
+                                                    <div class="space-y-1">
+                                                        <div v-for="(item, i) in value" :key="i"
+                                                            class="flex items-center gap-2">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                                            <template v-if="typeof item === 'object'">
+                                                                <div class="space-y-1">
+                                                                    <div v-for="(val, k) in item" :key="k"
+                                                                        class="text-gray-700 dark:text-gray-300">
+                                                                        <span class="font-medium">{{ formatKey(k) }}:</span> {{ val }}
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                            <template v-else>
+                                                                {{ item }}
+                                                            </template>
                                                         </div>
-                                                    </template>
-                                                    <template v-else>
-                                                        {{ item }}
-                                                    </template>
-                                                </div>
+                                                    </div>
+                                                </template>
+                                                <template v-else-if="key === 'canvasFingerprint'">
+                                                    <div class="space-y-2">
+                                                        <div class="p-2 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
+                                                            {{ value.substring(0, 64) }}...
+                                                        </div>
+                                                        <img :src="value" alt="Canvas Fingerprint"
+                                                            class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[200px] shadow-sm" />
+                                                    </div>
+                                                </template>
+                                                <template v-else-if="key === 'audioFingerprint'">
+                                                    <div class="space-y-2">
+                                                        <div class="p-2 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
+                                                            {{ value?.hash || 'No audio fingerprint available' }}
+                                                        </div>
+                                                        <div class="relative p-2 overflow-hidden bg-white border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+                                                            <AudioVisualizer :audio-data="value" />
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template v-else-if="typeof value === 'object'">
+                                                    <pre class="p-2 overflow-x-auto text-xs rounded-lg bg-gray-50 dark:bg-gray-900">{{ JSON.stringify(value, null, 2) }}</pre>
+                                                </template>
+                                                <template v-else>
+                                                    {{ value }}
+                                                </template>
                                             </div>
-                                        </template>
-                                        <template v-else-if="key === 'canvasFingerprint'">
-                                            <div class="space-y-3">
-                                                <div
-                                                    class="p-3 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
-                                                    {{ value.substring(0, 64) }}...
-                                                </div>
-                                                <img :src="value" alt="Canvas Fingerprint"
-                                                    class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[200px] shadow-sm" />
-                                            </div>
-                                        </template>
-                                        <template v-else-if="key === 'audioFingerprint'">
-                                            <div class="space-y-3">
-                                                <div
-                                                    class="p-3 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
-                                                    {{ value?.hash || 'No audio fingerprint available' }}
-                                                </div>
-                                                <div class="relative p-4 overflow-hidden bg-white border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-800">
-                                                    <AudioVisualizer :audio-data="value" />
-                                                </div>
-                                            </div>
-                                        </template>
-                                        <template v-else-if="typeof value === 'object'">
-                                            <pre
-                                                class="p-3 overflow-x-auto text-xs rounded-lg bg-gray-50 dark:bg-gray-900">{{ JSON.stringify(value, null, 2) }}</pre>
-                                        </template>
-                                        <template v-else>
-                                            {{ value }}
-                                        </template>
-                                    </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
-                        </template>
-                        <p v-if="sectionIssues[section.id]" class="text-yellow-600">
-                            Note: Some data in this section may be incomplete or unavailable.
-                        </p>
-                    </div>
+                        </div>
+                    </Transition>
                 </div>
             </div>
 
@@ -462,6 +459,15 @@ const openInfoModal = (sectionId) => {
   currentSectionId.value = sectionId;
   infoModalOpen.value = true;
 };
+
+const toggleSection = (sectionId) => {
+    expandedSections.value[sectionId] = !expandedSections.value[sectionId];
+};
+
+const transitionStyles = computed(() => ({
+    overflow: 'hidden',
+    transition: 'max-height 0.3s ease-out, opacity 0.3s ease-out',
+}));
 </script>
 <style>
 .fade-enter-active,
@@ -488,5 +494,23 @@ const openInfoModal = (sectionId) => {
 
 .animate-fadeIn {
     animation: fadeIn 0.2s ease-out;
+}
+
+.section-content-enter-active,
+.section-content-leave-active {
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    overflow: hidden;
+}
+
+.section-content-enter-from,
+.section-content-leave-to {
+    max-height: 0;
+    opacity: 0;
+}
+
+.section-content-enter-to,
+.section-content-leave-from {
+    max-height: 1000px;
+    opacity: 1;
 }
 </style>
