@@ -133,13 +133,15 @@ import { ClientOnly } from '../../.nuxt/components';
                                 <TooltipTrigger asChild>
                                     <button 
                                         @click="openInfoModal(section.id)"
-                                        class="p-2 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        class="p-2 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                                         v-umami="{ name: 'Info Button Click', sectionTitle: section.title }"
                                     >
-                                        <Icon 
-                                            name="mdi:information"
-                                            class="w-5 h-5 text-gray-400 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
-                                        />
+                                        <div class="flex items-center justify-center w-5 h-5">
+                                            <Icon 
+                                                name="mdi:information"
+                                                class="w-5 h-5 text-gray-400 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+                                            />
+                                        </div>
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
