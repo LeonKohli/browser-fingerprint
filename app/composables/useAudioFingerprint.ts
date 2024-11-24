@@ -3,8 +3,10 @@ interface AudioFingerprintData {
 }
 
 export function useAudioFingerprint() {
+    const isSupported = useSupported(() => window.OfflineAudioContext !== undefined)
+
     const getAudioFingerprint = async (): Promise<AudioFingerprintData | null> => {
-        if (!import.meta.client) return null;
+        if (!isSupported.value) return null;
 
         try {
             // Get appropriate AudioContext constructor
@@ -61,6 +63,7 @@ export function useAudioFingerprint() {
     };
 
     return {
-        getAudioFingerprint
+        getAudioFingerprint,
+        isSupported
     };
 } 

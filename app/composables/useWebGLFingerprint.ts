@@ -1,11 +1,16 @@
 export function useWebGLFingerprint() {
+    const isWebGLSupported = useSupported(() => {
+        const canvas = document.createElement('canvas')
+        return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    })
+
     const getWebGLFingerprint = () => {
-        if (!import.meta.client) {
+        if (!import.meta.client || !isWebGLSupported.value) {
             return {
-                error: 'Not running in browser context',
+                error: 'WebGL not supported',
                 renderer: null,
                 vendor: null
-            };
+            }
         }
 
         try {
@@ -57,6 +62,7 @@ export function useWebGLFingerprint() {
     };
 
     return {
-        getWebGLFingerprint
+        getWebGLFingerprint,
+        isWebGLSupported
     };
 } 

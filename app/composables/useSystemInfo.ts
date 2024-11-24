@@ -24,13 +24,13 @@ interface BatteryManager {
 }
 
 export function useSystemInfo() {
-    const getSystemInfo = async (): Promise<{
-        osInfo: string;
-        cpuCores: number;
-        deviceMemory: number;
-        batteryInfo: BatteryInfo | null;
-        bluetoothAvailable: boolean;
-    }> => {
+    const preferredLanguages = usePreferredLanguages()
+    const memory = useMemory()
+    const battery = useBattery()
+    const devicePixelRatio = useDevicePixelRatio()
+    const screenOrientation = useScreenOrientation()
+
+    const getSystemInfo = async () => {
         if (!import.meta.client) {
             return {
                 osInfo: 'Unknown',
@@ -38,61 +38,41 @@ export function useSystemInfo() {
                 deviceMemory: 0,
                 batteryInfo: null,
                 bluetoothAvailable: false,
-            };
-        }
-
-        const nav = navigator as NavigatorExtended;
-        let osInfo = 'Unknown';
-        let cpuCores = nav.hardwareConcurrency;
-        let deviceMemory = nav.deviceMemory || 0;
-
-        // Attempt to get more accurate OS information
-        if (nav.userAgentData) {
-            osInfo = nav.userAgentData.platform;
-        } else {
-            const userAgent = nav.userAgent.toLowerCase();
-            if (userAgent.includes('win')) osInfo = 'Windows';
-            else if (userAgent.includes('mac')) osInfo = 'macOS';
-            else if (userAgent.includes('linux')) osInfo = 'Linux';
-            else if (userAgent.includes('android')) osInfo = 'Android';
-            else if (userAgent.includes('ios')) osInfo = 'iOS';
-        }
-
-        // Get battery information
-        let batteryInfo: BatteryInfo | null = null;
-        if (nav.getBattery) {
-            try {
-                const battery = await nav.getBattery();
-                batteryInfo = {
-                    charging: battery.charging,
-                    chargingTime: battery.chargingTime,
-                    dischargingTime: battery.dischargingTime,
-                    level: battery.level,
-                };
-            } catch (error) {
-                console.error('Error getting battery info:', error);
             }
         }
 
-        // Check Bluetooth availability
-        const bluetoothAvailable = 'bluetooth' in nav;
+        const nav = navigator as NavigatorExtended
+        let osInfo = 'Unknown'
+        let cpuCores = nav.hardwareConcurrency
+
+        // Attempt to get more accurate OS information
+        if (nav.userAgentData) {
+            osInfo = nav.userAgentData.platform
+        } else {
+            const userAgent = nav.userAgent.toLowerCase()
+            if (userAgent.includes('win')) osInfo = 'Windows'
+            else if (userAgent.includes('mac')) osInfo = 'macOS'
+            else if (userAgent.includes('linux')) osInfo = 'Linux'
+            else if (userAgent.includes('android')) osInfo = 'Android'
+            else if (userAgent.includes('ios')) osInfo = 'iOS'
+        }
 
         return {
             osInfo,
             cpuCores,
-            deviceMemory,
-            batteryInfo,
-            bluetoothAvailable,
-        };
-    };
+            deviceMemory: memory.memory.value?.jsHeapSizeLimit || 0,
+            batteryInfo: battery.isSupported.value ? {
+                charging: battery.charging.value,
+                chargingTime: battery.chargingTime.value,
+                dischargingTime: battery.dischargingTime.value,
+                level: battery.level.value,
+            } : null,
+            bluetoothAvailable: 'bluetooth' in nav,
+            languages: preferredLanguages.value,
+        }
+    }
 
-    const getScreenInfo = (): {
-        width: number;
-        height: number;
-        colorDepth: number;
-        pixelRatio: number;
-        orientation: string;
-    } => {
+    const getScreenInfo = () => {
         if (!import.meta.client) {
             return {
                 width: 0,
@@ -100,20 +80,20 @@ export function useSystemInfo() {
                 colorDepth: 0,
                 pixelRatio: 1,
                 orientation: 'unknown',
-            };
+            }
         }
 
         return {
             width: window.screen.width,
             height: window.screen.height,
             colorDepth: window.screen.colorDepth,
-            pixelRatio: window.devicePixelRatio,
-            orientation: screen.orientation?.type || 'unknown',
-        };
-    };
+            pixelRatio: devicePixelRatio.pixelRatio,
+            orientation: screenOrientation.orientation.value || 'unknown',
+        }
+    }
 
     return {
         getSystemInfo,
         getScreenInfo
-    };
+    }
 } 
