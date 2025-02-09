@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   site: {
     url: 'https://trackme.dev/',
     name: 'Browser Fingerprint',
-    description: 'Generate and analyze your unique browser fingerprint. Check your digital privacy and understand how websites can track you.',
+    description: 'Generate and analyze your unique browser fingerprint. Understand how websites can track you.',
     defaultLocale: 'en',
   },
   ogImage: {
