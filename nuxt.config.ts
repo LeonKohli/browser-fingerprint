@@ -54,4 +54,16 @@ export default defineNuxtConfig({
     // enabled: false,
     // logErrors: true,
   },
+  
+  app: {
+    head: {
+      script: [
+        {
+          src: 'https://webry.leonkohli.de/api/script.js',
+          defer: true,
+          'data-site-id': '1',
+        },
+      ],
+    },
+  },
 })
