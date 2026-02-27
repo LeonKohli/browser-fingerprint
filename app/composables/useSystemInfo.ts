@@ -61,7 +61,9 @@ export function useSystemInfo() {
         return {
             osInfo,
             cpuCores,
-            deviceMemory: memory.memory.value?.jsHeapSizeLimit || 0,
+            // navigator.deviceMemory returns RAM in GB (0.25, 0.5, 1, 2, 4, 8)
+            // Only available in Chromium browsers. Returns undefined in Firefox/Safari.
+            deviceMemory: (navigator as any).deviceMemory || null,
             batteryInfo: battery.isSupported.value ? {
                 charging: battery.charging.value,
                 chargingTime: battery.chargingTime.value,
@@ -86,14 +88,16 @@ export function useSystemInfo() {
             }
         }
 
+        // Sort dimensions descending for rotation independence
+        // Remove window dimensions (too unstable for fingerprinting)
+        const w = window.screen.width
+        const h = window.screen.height
         return {
-            width: window.screen.width,
-            height: window.screen.height,
+            width: Math.max(w, h),
+            height: Math.min(w, h),
             colorDepth: window.screen.colorDepth,
             pixelRatio: pixelRatio.value,
             orientation: screenOrientation.orientation?.value || 'unknown',
-            windowWidth: windowSize.width.value,
-            windowHeight: windowSize.height.value,
         }
     }
 

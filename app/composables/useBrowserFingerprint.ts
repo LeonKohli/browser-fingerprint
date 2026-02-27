@@ -161,8 +161,18 @@ export function useBrowserFingerprint() {
         // Calculate entropy
         const entropyScore = calculateEntropy(fp)
 
-        // Generate hash
-        const fingerprintString = JSON.stringify(fp)
+        // Create stable fingerprint data for hashing
+        // Exclude volatile data that changes frequently
+        const stableFp = JSON.parse(JSON.stringify(fp))
+        if (stableFp.system?.battery) {
+            delete stableFp.system.battery
+        }
+        if (stableFp.system?.batteryInfo) {
+            delete stableFp.system.batteryInfo
+        }
+
+        // Generate hash from stable data only
+        const fingerprintString = JSON.stringify(stableFp)
         const encoder = new TextEncoder()
         const data = encoder.encode(fingerprintString)
         const hashBuffer = await crypto.subtle.digest('SHA-256', data)
