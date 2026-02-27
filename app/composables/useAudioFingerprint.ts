@@ -30,7 +30,7 @@ export function useAudioFingerprint() {
                     // Create oscillator
                     const oscillator = context.createOscillator();
                     oscillator.type = "triangle";
-                    oscillator.frequency.value = 1000;
+                    oscillator.frequency.value = 10000;
 
                     // Create compressor
                     const compressor = context.createDynamicsCompressor();
@@ -38,7 +38,7 @@ export function useAudioFingerprint() {
                     compressor.knee.value = 40;
                     compressor.ratio.value = 12;
                     compressor.attack.value = 0;
-                    compressor.release.value = 0.2;
+                    compressor.release.value = 0.25;
 
                     // Connect nodes
                     oscillator.connect(compressor);
@@ -55,8 +55,11 @@ export function useAudioFingerprint() {
 
                     // Get samples and calculate hash
                     const samples = buffer.getChannelData(0);
+                    // Hash only steady-state samples (after compressor settles)
+                    // First 4500 samples contain oscillator startup transients that
+                    // vary between renders. Last 500 are steady-state.
                     let hash = 0;
-                    for (let i = 0; i < samples.length; ++i) {
+                    for (let i = 4500; i < samples.length; ++i) {
                         const sample = samples[i];
                         if (typeof sample === 'number') {
                             hash += Math.abs(sample);
