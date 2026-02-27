@@ -194,11 +194,33 @@ import { ClientOnly } from '../../.nuxt/components';
                                                 </template>
                                                 <template v-else-if="key === 'canvasFingerprint'">
                                                     <div class="space-y-2">
-                                                        <div class="p-2 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
-                                                            {{ value.substring(0, 64) }}...
-                                                        </div>
-                                                        <img :src="value" alt="Canvas Fingerprint"
-                                                            class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[200px] shadow-sm" />
+                                                        <template v-if="value?.unstable">
+                                                            <div class="p-2 text-xs text-yellow-600 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-400">
+                                                                Anti-fingerprinting detected — canvas is unstable
+                                                            </div>
+                                                        </template>
+                                                        <template v-else-if="typeof value === 'object'">
+                                                            <div class="flex gap-3">
+                                                                <div v-if="value?.text" class="space-y-1">
+                                                                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Text</div>
+                                                                    <img :src="value.text" alt="Canvas Text Fingerprint"
+                                                                        class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[240px] shadow-sm" />
+                                                                </div>
+                                                                <div v-if="value?.geometry" class="space-y-1">
+                                                                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Geometry</div>
+                                                                    <img :src="value.geometry" alt="Canvas Geometry Fingerprint"
+                                                                        class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[122px] shadow-sm" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                                Winding: {{ value?.winding ? 'supported' : 'unsupported' }}
+                                                            </div>
+                                                        </template>
+                                                        <template v-else>
+                                                            <div class="p-2 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900">
+                                                                {{ String(value).substring(0, 64) }}...
+                                                            </div>
+                                                        </template>
                                                     </div>
                                                 </template>
                                                 <template v-else-if="key === 'audioFingerprint'">
