@@ -28,43 +28,41 @@ export function useFontDetection() {
             'Liberation Sans', 'Liberation Serif', 'Ubuntu', 'Ubuntu Mono',
             'Noto Sans', 'Noto Serif', 'Droid Sans', 'Droid Serif',
             'FreeMono', 'FreeSans', 'FreeSerif', 'Nimbus Roman', 'Nimbus Sans',
-            
-            // Popular Web Fonts
-            'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Source Sans Pro',
-            'Raleway', 'PT Sans', 'Noto Sans', 'Ubuntu', 'Nunito',
-            'Playfair Display', 'Poppins', 'Merriweather', 'Oswald',
-            'Quicksand', 'Dancing Script', 'Pacifico'
         ];
 
-        const testString = 'mmmmmmmmmmlli';
-        const testSize = '72px';
+        // Uses wide chars (m/M/W), narrow chars (l/i/I), distinctive shapes (0/O/&/1)
+        const testString = 'mmMwWLliI0O&1';
+        const testSize = '48px';
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
         if (!context) {
-            return {
-                fonts: [],
-                total: 0
-            };
+            return { fonts: [], total: 0 };
         }
 
-        const detectFont = (font: string): boolean => {
-            const baseWidth: Record<string, number> = {};
-            baseFonts.forEach(baseFont => {
-                context.font = `${testSize} ${baseFont}`;
-                baseWidth[baseFont] = context.measureText(testString).width;
-            });
+        // Compute baselines ONCE (not per font)
+        const baseWidth: Record<string, number> = {};
+        const baseHeight: Record<string, number> = {};
+        baseFonts.forEach(baseFont => {
+            context.font = `${testSize} ${baseFont}`;
+            const metrics = context.measureText(testString);
+            baseWidth[baseFont] = metrics.width;
+            // Use actualBoundingBoxAscent + actualBoundingBoxDescent for height
+            baseHeight[baseFont] = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+        });
 
-            let detected = false;
+        const detectFont = (font: string): boolean => {
             for (const baseFont of baseFonts) {
                 context.font = `${testSize} "${font}", ${baseFont}`;
-                const width = context.measureText(testString).width;
-                if (width !== baseWidth[baseFont]) {
-                    detected = true;
-                    break;
+                const metrics = context.measureText(testString);
+                const width = metrics.width;
+                const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+                // Check both width AND height differences
+                if (width !== baseWidth[baseFont] || height !== baseHeight[baseFont]) {
+                    return true;
                 }
             }
-            return detected;
+            return false;
         };
 
         const detectedFonts = fontList.filter(font => detectFont(font));
