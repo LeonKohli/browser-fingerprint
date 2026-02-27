@@ -39,9 +39,12 @@ export function useBrowserFingerprint() {
         return { browserName, version }
     }
 
-    const detectPrivateMode = async (): Promise<boolean> => {
-        const { isPrivate } = await detectIncognito()
-        return isPrivate
+    const detectPrivateMode = async () => {
+        const result = await detectIncognito()
+        return {
+            isPrivate: result.isPrivate,
+            confidence: result.confidence,
+        }
     }
 
     const generateFingerprint = async () => {
@@ -68,7 +71,7 @@ export function useBrowserFingerprint() {
                 vendor: navigator.vendor || 'Unknown',
                 browserName: browserInfo.browserName,
                 browserVersion: browserInfo.version,
-                isPrivateMode: await detectPrivateMode(),
+                privateMode: await detectPrivateMode(),
                 plugins: Array.from(navigator.plugins)
                     .map(p => ({
                         name: p.name,
@@ -119,7 +122,7 @@ export function useBrowserFingerprint() {
         try {
             // Collect media information
             fp.media = {
-                canvasFingerprint: await generateCanvasFingerprint(),
+                canvasFingerprint: generateCanvasFingerprint(),
                 audioFingerprint: await getAudioFingerprint(),
             }
         } catch (error) {
