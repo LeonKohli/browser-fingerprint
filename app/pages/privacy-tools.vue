@@ -4,7 +4,7 @@
             <!-- Header -->
             <div class="space-y-6 text-center">
                 <div class="relative inline-block">
-                    <div class="flex items-center justify-center w-16 h-16 transition-all duration-200 bg-white border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700 rounded-xl">
+                    <div class="flex items-center justify-center w-16 h-16 transition-all duration-200 bg-white border border-gray-200 shadow-xs dark:bg-gray-800 dark:border-gray-700 rounded-xl">
                         <Icon :name="content?.icon || 'mdi:shield-lock'" class="w-8 h-8 text-blue-500 dark:text-blue-400" />
                     </div>
                 </div>
@@ -21,17 +21,11 @@
 
             <!-- Warning Alert -->
             <Alert v-if="content?.warning" class="max-w-2xl mx-auto">
-                <template #default>
-                    <div class="flex gap-3">
-                        <Icon name="mdi:alert-circle" class="w-5 h-5 text-amber-500" />
-                        <div class="space-y-1">
-                            <p class="font-medium">{{ content.warning.title }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                {{ content.warning.description }}
-                            </p>
-                        </div>
-                    </div>
-                </template>
+                <AlertCircle class="h-4 w-4" />
+                <AlertTitle>{{ content.warning.title }}</AlertTitle>
+                <AlertDescription>
+                    {{ content.warning.description }}
+                </AlertDescription>
             </Alert>
 
             <!-- Tools Grid -->
@@ -43,7 +37,7 @@
                         </h2>
                         <div class="space-y-4">
                             <div v-for="tool in category.tools" :key="tool.name"
-                                class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group"
+                                class="relative overflow-hidden transition-all duration-200 bg-white shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md group"
                             >
                                 <div class="p-6">
                                     <div class="flex items-center gap-3 mb-3">
@@ -107,7 +101,7 @@
             </div>
 
             <!-- Best Practices Section -->
-            <div v-if="content?.bestPractices" class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 rounded-xl">
+            <div v-if="content?.bestPractices" class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 rounded-xl">
                 <div class="p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20">
@@ -141,7 +135,7 @@
             <div class="flex justify-center">
                 <NuxtLink 
                     to="/"
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-xs dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                     <Icon name="mdi:arrow-left" class="w-4 h-4" />
                     Back to Fingerprint Check
@@ -152,6 +146,8 @@
 </template>
 
 <script setup lang="ts">
+import { AlertCircle } from 'lucide-vue-next'
+
 // Fetch content data
 const { data: content } = await useAsyncData('privacy-tools', () => queryContent('privacy-tools').findOne())
 

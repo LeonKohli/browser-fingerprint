@@ -102,7 +102,7 @@ import { ClientOnly } from '../../.nuxt/components';
             <!-- Section Grid -->
             <div class="grid grid-cols-1 gap-6">
                 <div v-for="section in sections" :key="section.id"
-                    class="transition-all duration-200 bg-white border border-gray-100 shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md dark:border-gray-700">
+                    class="transition-all duration-200 bg-white border border-gray-100 shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md dark:border-gray-700">
                     <div class="flex items-center justify-between px-6 py-5">
                         <button @click="toggleSection(section.id)"
                             class="flex items-center flex-1 gap-4 text-left transition-colors rounded-xl group">
@@ -129,7 +129,7 @@ import { ClientOnly } from '../../.nuxt/components';
                                 <TooltipTrigger asChild>
                                     <button 
                                         @click.stop="openInfoModal(section.id)"
-                                        class="flex items-center justify-center w-8 h-8 ml-4 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                        class="flex items-center justify-center w-8 h-8 ml-4 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                                         v-umami="{ name: 'Info Button Click', sectionTitle: section.title }"
                                     >
                                         <Icon 
@@ -204,12 +204,12 @@ import { ClientOnly } from '../../.nuxt/components';
                                                                 <div v-if="value?.text" class="space-y-1">
                                                                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Text</div>
                                                                     <img :src="value.text" alt="Canvas Text Fingerprint"
-                                                                        class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[240px] shadow-sm" />
+                                                                        class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[240px] shadow-xs" />
                                                                 </div>
                                                                 <div v-if="value?.geometry" class="space-y-1">
                                                                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Geometry</div>
                                                                     <img :src="value.geometry" alt="Canvas Geometry Fingerprint"
-                                                                        class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[122px] shadow-sm" />
+                                                                        class="border border-gray-200 dark:border-gray-700 rounded-lg max-w-[122px] shadow-xs" />
                                                                 </div>
                                                             </div>
                                                             <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -253,7 +253,7 @@ import { ClientOnly } from '../../.nuxt/components';
             <div class="flex flex-wrap items-center justify-center gap-4">
                 <NuxtLink 
                     to="/privacy-tools"
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-xs dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                     v-umami="'Privacy Tools Link Click'"
                 >
                     <Icon name="mdi:shield-lock" class="w-4 h-4" />
@@ -262,7 +262,7 @@ import { ClientOnly } from '../../.nuxt/components';
 
                 <NuxtLink 
                     to="/links"
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-xs dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                     v-umami="'Links and Resources Link Click'"
                 >
                     <Icon name="mdi:link-variant" class="w-4 h-4" />
@@ -273,7 +273,7 @@ import { ClientOnly } from '../../.nuxt/components';
                     href="https://www.buymeacoffee.com/LeonKohli"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-800 transition-colors bg-yellow-100 border border-yellow-200 rounded-lg shadow-sm hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-900/50 dark:hover:bg-yellow-900/50"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-800 transition-colors bg-yellow-100 border border-yellow-200 rounded-lg shadow-xs hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-900/50 dark:hover:bg-yellow-900/50"
                     v-umami="'Buy Me a Coffee Click'"
                 >
                     <Icon name="mdi:coffee" class="w-4 h-4" />
@@ -283,19 +283,13 @@ import { ClientOnly } from '../../.nuxt/components';
 
             <!-- Privacy Information Alert -->
             <Alert class="max-w-2xl mx-auto">
-                <template #default>
-                    <div class="flex gap-3">
-                        <Icon name="mdi:shield-alert" class="w-5 h-5 text-blue-500" />
-                        <div class="space-y-1">
-                            <p class="font-medium">Privacy Information</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                This tool demonstrates browser fingerprinting techniques. Your browser's fingerprint can
-                                be used to track you across websites, even in private browsing mode or when using VPN
-                                services.
-                            </p>
-                        </div>
-                    </div>
-                </template>
+                <ShieldAlert class="h-4 w-4" />
+                <AlertTitle>Privacy Information</AlertTitle>
+                <AlertDescription>
+                    This tool demonstrates browser fingerprinting techniques. Your browser's fingerprint can
+                    be used to track you across websites, even in private browsing mode or when using VPN
+                    services.
+                </AlertDescription>
             </Alert>
         </div>
     </main>
@@ -309,6 +303,8 @@ import { ClientOnly } from '../../.nuxt/components';
 </template>
 
 <script setup>
+import { ShieldAlert } from 'lucide-vue-next'
+
 const {
     generateFingerprint,
     formatKey,
