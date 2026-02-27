@@ -6,7 +6,7 @@ sections:
   - title: How it Works
     icon: mdi:code-braces
     content: >
-      Browser fingerprinting in this implementation collects various browser-specific attributes using JavaScript APIs. This includes the user agent string, browser language settings, cookie enablement status, Do Not Track preference, vendor information, and installed plugins. It also detects whether you're using private browsing mode and identifies your specific browser name and version through user agent analysis.
+      Browser fingerprinting collects various browser-specific attributes using JavaScript APIs. This includes the user agent string (~10 bits of entropy per AmIUnique), browser language settings (~3.9 bits), platform (~2.7 bits), cookie enablement status, Do Not Track preference (being deprecated), vendor information, and pdfViewerEnabled. Private browsing detection uses engine-specific techniques: Safari's IndexedDB Blob storage limitation (high confidence), Chromium's storage quota estimation (medium confidence, threatened by predictable-reported-quota flag), and Firefox where no reliable method exists since Firefox 138+ enabled ServiceWorkers in private mode. Note: navigator.plugins is now frozen/hardcoded in all modern browsers since ~2021 and provides zero distinguishing entropy — all browsers return the same 5 PDF-related plugins.
 
   - title: Privacy Implications
     icon: mdi:shield-alert

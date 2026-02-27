@@ -6,7 +6,7 @@ sections:
   - title: How it Works
     icon: mdi:code-braces
     content: >
-      WebGL fingerprinting in this implementation collects information about your graphics hardware using the WebGL API. It retrieves the renderer and vendor strings through the WEBGL_debug_renderer_info extension, along with supported WebGL extensions and various rendering parameters like maximum texture size, viewport dimensions, and other GPU capabilities.
+      WebGL fingerprinting collects detailed information about your graphics hardware using the WebGL API. It retrieves the unmasked renderer and vendor strings through WEBGL_debug_renderer_info (~7.3 bits per AmIUnique), along with VERSION, SHADING_LANGUAGE_VERSION, supported extensions, context attributes, and 21 GPU parameters including texture limits, bit depths, and viewport dimensions. Shader precision is queried across 6 precision types for both vertex and fragment shaders (12 data points), providing fine-grained GPU differentiation. This approach is based on FingerprintJS v5's parameter collection strategy.
 
   - title: Privacy Implications
     icon: mdi:shield-alert

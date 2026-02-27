@@ -6,7 +6,7 @@ sections:
   - title: How it Works
     icon: mdi:code-braces
     content: >
-      Screen fingerprinting in this implementation collects basic display characteristics using JavaScript's Screen API. This includes screen width and height, color depth, device pixel ratio (which indicates display scaling), and screen orientation. These properties are accessed directly through the window.screen object and related browser APIs.
+      Screen fingerprinting collects display characteristics using JavaScript's Screen API (~4.4 bits per AmIUnique). This includes screen width and height (sorted descending for rotation independence — so portrait and landscape return the same values), color depth, device pixel ratio (display scaling), and screen orientation. Window dimensions are intentionally excluded from the fingerprint as they change on every resize and would destabilize the hash.
 
   - title: Privacy Implications
     icon: mdi:shield-alert

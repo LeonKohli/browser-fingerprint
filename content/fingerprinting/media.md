@@ -6,7 +6,7 @@ sections:
   - title: How it Works
     icon: mdi:code-braces
     content: >
-      Media fingerprinting in this implementation focuses on two main aspects: Canvas and Audio fingerprinting. Canvas fingerprinting works by drawing specific text, shapes, and colors using the HTML5 Canvas element and converting the result to a data URL. The subtle differences in how devices render these elements create a unique fingerprint. Audio fingerprinting uses the Web Audio API to create and process audio signals through an oscillator and compressor, analyzing the resulting audio data to generate a unique hash based on how your device processes audio.
+      Media fingerprinting focuses on two main aspects: Canvas and Audio fingerprinting. Canvas fingerprinting renders text with emoji (platform-specific rendering), geometry with multiply blending (GPU-dependent color mixing), and tests evenodd winding rules. A stability check (double-render comparison) detects anti-fingerprinting noise injection. Based on the FingerprintJS v5 approach, canvas provides ~8.28 bits of entropy (AmIUnique, Laperdrix 2016). Audio fingerprinting uses the Web Audio API to process a 10kHz triangle wave through a dynamics compressor, hashing only the steady-state samples (last 500 of 5000) for stability. Research by Chalise et al. (2022) found only 95 distinct audio fingerprint values across 2093 users (~6.5 bits), but it adds ~9.6% uniqueness when combined with canvas. Note: Safari 17+ and Firefox 120+ have introduced anti-fingerprinting noise for canvas; our stability check detects this and marks results as unstable.
 
   - title: Privacy Implications
     icon: mdi:shield-alert

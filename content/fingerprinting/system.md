@@ -6,7 +6,7 @@ sections:
   - title: How it Works
     icon: mdi:code-braces
     content: >
-      System fingerprinting in this implementation collects information about your system's environment using JavaScript APIs. This includes your timezone settings (obtained via Intl.DateTimeFormat), timezone offset (from Date.getTimezoneOffset()), and a comprehensive list of installed system fonts. The font detection is performed by measuring text rendering differences across various font families using the Canvas API.
+      System fingerprinting collects information about your system's environment using JavaScript APIs. This includes timezone settings (~3.4 bits per AmIUnique) obtained via Intl.DateTimeFormat, and a list of installed system fonts detected by measuring text rendering differences across font families using the Canvas API (~8.5 bits per AmIUnique). Font detection uses a varied test string ('mmMwWLliI0O&1') at 48px, checking both width and height metrics against baseline fonts. Note: Firefox limits font enumeration in strict Enhanced Tracking Protection mode, and some browsers are moving toward providing only a standard set of fonts to reduce fingerprint surface.
 
   - title: Privacy Implications
     icon: mdi:shield-alert

@@ -6,7 +6,7 @@ sections:
   - title: How it Works
     icon: mdi:code-braces
     content: >
-      Hardware fingerprinting in this implementation collects information about your device's physical capabilities using various browser APIs. This includes the number of CPU cores (via hardwareConcurrency), device memory, maximum touch points, and the availability of various hardware features like battery status, bluetooth, gamepads, and wake lock capabilities.
+      Hardware fingerprinting collects information about your device's physical capabilities using various browser APIs. This includes CPU cores via hardwareConcurrency (~3 bits), device memory via navigator.deviceMemory which returns RAM in GB (0.25, 0.5, 1, 2, 4, 8 — Chromium-only, ~2 bits), maximum touch points, and hardware feature availability. Note: navigator.deviceMemory is distinct from performance.memory.jsHeapSizeLimit (JS heap limit) — the former reports actual physical RAM, the latter reports the V8 heap limit. Battery data (charging state, level) is collected for display but excluded from the fingerprint hash since battery level changes constantly and would destabilize the fingerprint.
 
   - title: Privacy Implications
     icon: mdi:shield-alert
