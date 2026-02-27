@@ -72,6 +72,10 @@ export function useBrowserFingerprint() {
                 browserName: browserInfo.browserName,
                 browserVersion: browserInfo.version,
                 privateMode: await detectPrivateMode(),
+                pdfViewerEnabled: (navigator as any).pdfViewerEnabled ?? null,
+                // Note: navigator.plugins is frozen/hardcoded in modern browsers
+                // All browsers return the same 5 PDF-related plugins or empty
+                // Kept for display purposes but provides zero entropy
                 plugins: Array.from(navigator.plugins)
                     .map(p => ({
                         name: p.name,
