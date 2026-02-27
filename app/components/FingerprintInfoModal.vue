@@ -33,7 +33,7 @@
               <li v-for="item in section.items" :key="item"
                 class="flex items-start gap-3 text-base leading-relaxed text-gray-600 dark:text-gray-400"
               >
-                <Icon name="mdi:check-circle" class="w-5 h-5 mt-0.5 text-green-500 flex-shrink-0" />
+                <Icon name="mdi:check-circle" class="w-5 h-5 mt-0.5 text-green-500 shrink-0" />
                 <span v-html="renderMarkdownLinks(item)" class="flex-1" />
               </li>
             </ul>

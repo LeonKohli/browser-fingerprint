@@ -4,7 +4,7 @@
             <!-- Header -->
             <div class="space-y-6 text-center">
                 <div class="relative inline-block">
-                    <div class="flex items-center justify-center w-16 h-16 transition-all duration-200 bg-white border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700 rounded-xl">
+                    <div class="flex items-center justify-center w-16 h-16 transition-all duration-200 bg-white border border-gray-200 shadow-xs dark:bg-gray-800 dark:border-gray-700 rounded-xl">
                         <Icon :name="content?.icon || 'mdi:link-variant'" class="w-8 h-8 text-blue-500 dark:text-blue-400" />
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                         <!-- Scientific Articles Grid -->
                         <div v-if="section.type === 'papers'" class="space-y-4">
                             <div v-for="paper in section.links" :key="paper.title"
-                                class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group"
+                                class="relative overflow-hidden transition-all duration-200 bg-white shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md group"
                             >
                                 <div class="p-6">
                                     <div class="flex items-center gap-3 mb-3">
@@ -69,7 +69,7 @@
                                 :to="link.url"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group"
+                                class="relative overflow-hidden transition-all duration-200 bg-white shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md group"
                             >
                                 <div class="p-6">
                                     <div class="flex items-center gap-3 mb-3">
@@ -95,7 +95,7 @@
             <div class="flex justify-center">
                 <NuxtLink 
                     to="/"
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-200 rounded-lg shadow-xs dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                     <Icon name="mdi:arrow-left" class="w-4 h-4" />
                     Back to Fingerprint Check

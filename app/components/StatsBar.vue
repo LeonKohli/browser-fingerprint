@@ -2,7 +2,7 @@
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <!-- Entropy Score Card -->
         <div
-            class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group">
+            class="relative overflow-hidden transition-all duration-200 bg-white shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md group">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20">
@@ -43,7 +43,7 @@
 
         <!-- Browser Card -->
         <div
-            class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group">
+            class="relative overflow-hidden transition-all duration-200 bg-white shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md group">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20">
@@ -69,7 +69,7 @@
 
         <!-- Platform Card -->
         <div
-            class="relative overflow-hidden transition-all duration-200 bg-white shadow-sm dark:bg-gray-800 rounded-xl hover:shadow-md group">
+            class="relative overflow-hidden transition-all duration-200 bg-white shadow-xs dark:bg-gray-800 rounded-xl hover:shadow-md group">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
                     <div
